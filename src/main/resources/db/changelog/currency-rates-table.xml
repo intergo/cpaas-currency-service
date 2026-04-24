@@ -1,0 +1,19 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd
+        http://www.liquibase.org/xml/ns/dbchangelog-ext https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd">
+
+    <changeSet id="currency-rates-create-collection" author="alex">
+        <ext:createCollection collectionName="currency_rates"/>
+    </changeSet>
+
+    <changeSet id="currency-rates-index-currency-created-at" author="alex">
+        <ext:createIndex collectionName="currency_rates">
+            <ext:keys>{"currencyId": 1, "createdAt": -1}</ext:keys>
+            <ext:options>{"name": "idx_currency_rates_currencyId_createdAt"}</ext:options>
+        </ext:createIndex>
+    </changeSet>
+</databaseChangeLog>
