@@ -33,4 +33,10 @@ public class CurrencyService {
             .currencies(currencies)
             .build();
     }
+
+    public CurrencyResponseDTO createCurrency(CreateCurrencyRequestDTO dto) {
+      CurrencyEntity entity = currencyMapper.toEntity(dto);
+      currencyRepository.persist(entity);
+      return currencyMapper.toResponseDto(entity);
+    }
 }
