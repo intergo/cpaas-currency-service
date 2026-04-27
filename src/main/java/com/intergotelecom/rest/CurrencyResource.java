@@ -1,14 +1,19 @@
 package com.intergotelecom.rest;
 
-import com.intergotelecom.rest.dto.CurrencyDto;
+import com.intergotelecom.rest.dto.CreateCurrencyRequestDTO;
+import com.intergotelecom.rest.dto.CurrencyListResponseDTO;
+import com.intergotelecom.rest.dto.CurrencyResponseDTO;
 import com.intergotelecom.service.CurrencyService;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.validation.Valid;
+import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.GET;
+import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import java.util.List;
+import jakarta.ws.rs.core.Response.Status;
 import lombok.RequiredArgsConstructor;
 
 @ApplicationScoped
@@ -21,7 +26,18 @@ public class CurrencyResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getCurrencies() {
-        List<CurrencyDto> currencies = currencyService.getCurrencies();
+        CurrencyListResponseDTO currencies = currencyService.getCurrencies();
         return Response.ok(currencies).build();
+    }
+
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response createCurrency(@Valid CreateCurrencyRequestDTO createCurrencyRequestDTO) {
+        CurrencyResponseDTO created = currencyService.createCurrency(createCurrencyRequestDTO);
+
+        return Response.status(Status.CREATED)
+            .entity(created)
+            .build();
     }
 }
