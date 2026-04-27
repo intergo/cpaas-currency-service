@@ -16,6 +16,8 @@ import lombok.Setter;
 public class CurrencyEntity extends PanacheMongoEntity {
     private String currencyName;
 
+    private boolean baseCurrency;
+
     private boolean available;
 
     private LocalDateTime createdAt;
