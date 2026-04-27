@@ -1,12 +1,19 @@
 package com.intergotelecom.mapper;
 
 import com.intergotelecom.model.CurrencyEntity;
-import com.intergotelecom.rest.dto.CurrencyDto;
+import com.intergotelecom.rest.dto.CreateCurrencyRequestDTO;
+import com.intergotelecom.rest.dto.CurrencyResponseDTO;
+import java.time.LocalDateTime;
 import org.bson.types.ObjectId;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants.ComponentModel;
 
-@Mapper(componentModel = ComponentModel.CDI, imports = ObjectId.class)
+@Mapper(componentModel = ComponentModel.CDI, imports = {ObjectId.class, LocalDateTime.class})
 public interface CurrencyMapper {
-    CurrencyDto toDto(CurrencyEntity entity);
+    CurrencyResponseDTO toResponseDto(CurrencyEntity entity);
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "createdAt", expression = "java(LocalDateTime.now())")
+    CurrencyEntity toEntity(CreateCurrencyRequestDTO dto);
 }
