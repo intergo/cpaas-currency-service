@@ -8,6 +8,7 @@ import com.intergotelecom.rest.dto.CurrencyListResponseDTO;
 import com.intergotelecom.rest.dto.CurrencyResponseDTO;
 import jakarta.enterprise.context.ApplicationScoped;
 import java.util.List;
+import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 
 @ApplicationScoped
@@ -24,7 +25,7 @@ public class CurrencyService {
             .map(currencyMapper::toResponseDto)
             .toList();
 
-        String baseCurrencyName = currencyRepository.findBaseCurrency()
+        String baseCurrencyName = getBaseCurrencyOptional()
             .map(CurrencyEntity::getCurrencyName)
             .orElse(null);
 
@@ -35,8 +36,19 @@ public class CurrencyService {
     }
 
     public CurrencyResponseDTO createCurrency(CreateCurrencyRequestDTO dto) {
+      // only 1 currency should be set as base
+      if (dto.isBaseCurrency()) {
+        getBaseCurrencyOptional().ifPresent(
+            currencyEntity -> currencyEntity.setBaseCurrency(false));
+      }
+
+      // convert to entity and persist
       CurrencyEntity entity = currencyMapper.toEntity(dto);
       currencyRepository.persist(entity);
       return currencyMapper.toResponseDto(entity);
+    }
+
+    private Optional<CurrencyEntity> getBaseCurrencyOptional() {
+      return currencyRepository.findBaseCurrency();
     }
 }
