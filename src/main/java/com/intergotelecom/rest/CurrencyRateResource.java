@@ -1,9 +1,9 @@
 package com.intergotelecom.rest;
 
 import com.intergotelecom.rest.dto.CurrencyRateResponseDTO;
-import com.intergotelecom.rest.dto.UpdateCurrencyRateRequestDTO;
+import com.intergotelecom.rest.dto.UpdateCurrencyRatesRequestDTO;
 import com.intergotelecom.service.CurrencyRateService;
-import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.context.RequestScoped;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.Consumes;
 import jakarta.ws.rs.POST;
@@ -14,7 +14,7 @@ import jakarta.ws.rs.core.Response;
 import jakarta.ws.rs.core.Response.Status;
 import lombok.RequiredArgsConstructor;
 
-@ApplicationScoped
+@RequestScoped
 @Path("/api/v1/currency-rate")
 @RequiredArgsConstructor
 public class CurrencyRateResource {
@@ -24,8 +24,12 @@ public class CurrencyRateResource {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response setCurrencyRate(@Valid UpdateCurrencyRateRequestDTO request) {
-        CurrencyRateResponseDTO created = currencyRateService.setCurrencyRate(request);
-        return Response.status(Status.CREATED).entity(created).build();
+    public Response setCurrencyRates(@Valid UpdateCurrencyRatesRequestDTO request) {
+        var baseCurrencyName = request.getBaseCurrencyName();
+        var currencyRates = request.getCurrencyRates();
+
+        CurrencyRateResponseDTO created = currencyRateService.setCurrencyRates(baseCurrencyName, currencyRates);
+
+        return Response.status(Status.OK).entity(created).build();
     }
 }
