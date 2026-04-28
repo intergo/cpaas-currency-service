@@ -1,6 +1,8 @@
 package com.intergotelecom.service;
 
 import com.intergotelecom.mapper.CurrencyRateMapper;
+import com.intergotelecom.model.CurrencyEntity;
+import com.intergotelecom.model.CurrencyRateEntity;
 import com.intergotelecom.repository.CurrencyRateRepository;
 import com.intergotelecom.rest.dto.CurrencyRateResponseDTO;
 import com.intergotelecom.rest.dto.UpdateCurrencyRateDTO;
@@ -8,6 +10,10 @@ import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.NotFoundException;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 
 @Transactional
@@ -23,21 +29,68 @@ public class CurrencyRateService {
     private final
     CurrencyService currencyService;
 
-    public CurrencyRateResponseDTO setCurrencyRates(
-        String baseCurrency, List<UpdateCurrencyRateDTO> currencyRates) {
+    public List<CurrencyRateResponseDTO> setCurrencyRates(
+            String baseCurrencyName, List<UpdateCurrencyRateDTO> currencyRatesDTOs) {
+        // create a map with rate DTOs
+        Map<String, UpdateCurrencyRateDTO> currencyRatesMap = currencyRatesDTOs.stream()
+            .collect(Collectors.toMap(
+                UpdateCurrencyRateDTO::getCurrencyName,
+                Function.identity()));
 
-        var baseCurrencyEntity = currencyService.getBaseCurrencyOptional()
-            .orElseThrow(() -> new NotFoundException("Base currency not found: " + baseCurrency));
+        Set<String> currenciesToUpdate = currencyRatesMap.keySet();
 
-        var currencyNames = currencyRates.stream()
-            .map(UpdateCurrencyRateDTO::getCurrencyName)
-            .distinct()
+        // fetch existing rate entities
+        List<CurrencyRateEntity> rateEntities = getCurrencyRates(
+            baseCurrencyName, currenciesToUpdate);
+
+        List<String> currenciesWithRate = rateEntities.stream()
+            .map(rateEntity ->
+                rateEntity.getCurrency().getCurrencyName())
             .toList();
 
-        var currencyEntities = currencyService.getCurrenciesByName(currencyNames);
+        // update rates for existing entities
+        rateEntities.forEach(rateEntity -> {
+            var rateDTO = currencyRatesMap.get(
+                rateEntity.getCurrency().getCurrencyName());
+            rateEntity.setRate(rateDTO.getRate());
+        });
 
-        currencyRateRepository.persist(entity);
+        // find currencies with missing rates
+        List<String> missingCurrencyNames = currenciesToUpdate.stream()
+            .filter(name -> !currenciesWithRate.contains(name))
+            .toList();
 
-        return currencyRateMapper.toResponseDto(entity);
+        // fetch currency entities for missing rates
+        List<CurrencyEntity> missingCurrencies =
+            currencyService.getCurrenciesByName(missingCurrencyNames);
+
+        if (missingCurrencies.isEmpty()) {
+            return currencyRateMapper.toResponseDto(rateEntities);
+        }
+
+        // fetch base currency
+        CurrencyEntity baseCurrencyEntity = currencyService.getBaseCurrencyOptional()
+            .orElseThrow(() -> new NotFoundException("Base currency not found: " + baseCurrencyName));
+
+        // create new rate entities
+        List<CurrencyRateEntity> newRateEntities = missingCurrencies.stream()
+            .map(currencyEntity -> {
+              UpdateCurrencyRateDTO rateDTO = currencyRatesMap.get(currencyEntity.getCurrencyName());
+              return currencyRateMapper.toEntity(rateDTO, currencyEntity, baseCurrencyEntity);
+          })
+          .toList();
+
+        // persist new entities
+        currencyRateRepository.persist(newRateEntities);
+
+        // create response and return
+        rateEntities.addAll(newRateEntities);
+
+        return currencyRateMapper.toResponseDto(rateEntities);
+    }
+
+    private List<CurrencyRateEntity> getCurrencyRates(String baseCurrency, Set<String> currencyNames) {
+      return currencyRateRepository.findByCurrencyAndBaseCurrency(
+          baseCurrency, currencyNames);
     }
 }
