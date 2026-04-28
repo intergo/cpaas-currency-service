@@ -50,7 +50,11 @@ public class CurrencyService {
       return currencyMapper.toResponseDto(entity);
     }
 
-    private Optional<CurrencyEntity> getBaseCurrencyOptional() {
+    public List<CurrencyEntity> getCurrenciesByName(List<String> currencyNames) {
+      return currencyRepository.findAvailableByName(currencyNames);
+    }
+
+    public Optional<CurrencyEntity> getBaseCurrencyOptional() {
       return currencyRepository.findBaseCurrency();
     }
 }
