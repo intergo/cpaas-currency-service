@@ -1,9 +1,11 @@
 package com.intergotelecom.rest;
 
 import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.is;
 
 import com.intergotelecom.config.BaseIntegrationTest;
 import com.intergotelecom.factory.CurrencyDataFactory;
+import com.intergotelecom.rest.dto.CreateCurrencyRequestDTO;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response.Status;
@@ -20,6 +22,40 @@ class CurrencyResourceTest extends BaseIntegrationTest {
     @BeforeEach
     void setUp() {
         currencyDataFactory.cleanDatabase();
+    }
+
+    @Test
+    void createCurrency_returnsCreatedCurrency() {
+        var request = CreateCurrencyRequestDTO.builder()
+            .currencyName("USD")
+            .baseCurrency(false)
+            .available(true)
+            .build();
+
+        given()
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(request)
+        .when()
+            .post("/api/v1/currency")
+        .then()
+            .statusCode(Status.CREATED.getStatusCode())
+            .body("currency_name", is("USD"));
+    }
+
+    @Test
+    void createCurrency_returnsBadRequest_whenCurrencyNameBlank() {
+        var request = CreateCurrencyRequestDTO.builder()
+            .currencyName("")
+            .available(true)
+            .build();
+
+        given()
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(request)
+        .when()
+            .post("/api/v1/currency")
+        .then()
+            .statusCode(Status.BAD_REQUEST.getStatusCode());
     }
 
     @Test
