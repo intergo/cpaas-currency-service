@@ -10,7 +10,7 @@ import java.util.Set;
 public class CurrencyRateRepository implements PanacheRepository<CurrencyRateEntity> {
     public List<CurrencyRateEntity> findByCurrencyAndBaseCurrency(
         String baseCurrency, Set<String> currencyNames) {
-      return list("baseCurrency.currencyName = ?1 and currency.currencyName in ?1",
+      return list("baseCurrency.currencyName = ?1 and currency.currencyName in ?2",
           baseCurrency, currencyNames);
     }
 }
