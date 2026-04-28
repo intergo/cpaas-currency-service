@@ -1,9 +1,9 @@
 package com.intergotelecom.repository;
 
 import com.intergotelecom.model.CurrencyRateEntity;
-import io.quarkus.mongodb.panache.PanacheMongoRepository;
+import io.quarkus.hibernate.orm.panache.PanacheRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 
 @ApplicationScoped
-public class CurrencyRateRepository implements PanacheMongoRepository<CurrencyRateEntity> {
+public class CurrencyRateRepository implements PanacheRepository<CurrencyRateEntity> {
 }

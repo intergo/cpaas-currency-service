@@ -1,7 +1,7 @@
 package com.intergotelecom.repository;
 
 import com.intergotelecom.model.CustomCurrencyRateEntity;
-import io.quarkus.mongodb.panache.PanacheMongoRepository;
+import io.quarkus.hibernate.orm.panache.PanacheRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 
 @ApplicationScoped
