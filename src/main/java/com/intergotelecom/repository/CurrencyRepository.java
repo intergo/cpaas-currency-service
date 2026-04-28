@@ -12,6 +12,12 @@ public class CurrencyRepository implements PanacheRepository<CurrencyEntity> {
         return list("available = ?1 and baseCurrency = ?2", true, false);
     }
 
+    public List<CurrencyEntity> findAvailableByName(List<String> currencyNames) {
+      return list("currencyName in ?1 and available = ?2 and baseCurrency = ?3",
+          currencyNames, true, false
+      );
+    }
+
     public Optional<CurrencyEntity> findBaseCurrency() {
         return find("baseCurrency", true).firstResultOptional();
     }
