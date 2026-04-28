@@ -13,4 +13,9 @@ public class CurrencyRateRepository implements PanacheRepository<CurrencyRateEnt
       return list("baseCurrency.currencyName = ?1 and currency.currencyName in ?2",
           baseCurrency, currencyNames);
     }
+
+    public List<CurrencyRateEntity> findByBaseCurrency(String baseCurrencyName) {
+      return list("baseCurrency.currencyName = ?1 and currency.available = ?2",
+          baseCurrencyName, true);
+    }
 }

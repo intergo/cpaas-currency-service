@@ -6,9 +6,11 @@ import com.intergotelecom.service.CurrencyRateService;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.validation.Valid;
 import jakarta.ws.rs.Consumes;
+import jakarta.ws.rs.GET;
 import jakarta.ws.rs.POST;
 import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
+import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
 import lombok.RequiredArgsConstructor;
@@ -19,6 +21,13 @@ import lombok.RequiredArgsConstructor;
 public class CurrencyRateResource {
     private final
     CurrencyRateService currencyRateService;
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getCurrencyRates(@QueryParam("base_currency") String baseCurrencyName) {
+        CurrencyRatesResponseDTO responseDTO = currencyRateService.getCurrencyRates(baseCurrencyName);
+        return Response.ok(responseDTO).build();
+    }
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
