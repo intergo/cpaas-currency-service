@@ -5,7 +5,6 @@ import io.quarkus.hibernate.orm.panache.PanacheRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 @ApplicationScoped
 public class CurrencyRepository implements PanacheRepository<CurrencyEntity> {
@@ -14,12 +13,6 @@ public class CurrencyRepository implements PanacheRepository<CurrencyEntity> {
     }
 
     public List<CurrencyEntity> findAvailableByName(List<String> currencyNames) {
-      return list("currencyName in ?1 and available = ?2 and baseCurrency = ?3",
-          currencyNames, true, false
-      );
-    }
-
-    public List<CurrencyEntity> findAvailableByName(Set<String> currencyNames) {
       return list("currencyName in ?1 and available = ?2 and baseCurrency = ?3",
           currencyNames, true, false
       );
