@@ -16,8 +16,5 @@ public class CurrencyRateResponseDTO {
     @JsonProperty("currency_name")
     private String currencyName;
 
-    @JsonProperty("base_currency_name")
-    private String baseCurrencyName;
-
     private BigDecimal rate;
 }

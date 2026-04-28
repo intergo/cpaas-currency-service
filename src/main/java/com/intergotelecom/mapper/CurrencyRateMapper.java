@@ -13,7 +13,6 @@ import org.mapstruct.MappingConstants.ComponentModel;
 @Mapper(componentModel = ComponentModel.CDI)
 public interface CurrencyRateMapper {
     @Mapping(target = "currencyName", source = "currency.currencyName")
-    @Mapping(target = "baseCurrencyName", source = "baseCurrency.currencyName")
     CurrencyRateResponseDTO toResponseDto(CurrencyRateEntity entity);
 
     List<CurrencyRateResponseDTO> toResponseDto(List<CurrencyRateEntity> entity);
