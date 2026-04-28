@@ -13,13 +13,11 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 @SuperBuilder(toBuilder = true)
 public class CurrencyRateResponseDTO {
-    private String id;
-
     @JsonProperty("currency_name")
     private String currencyName;
 
-    private BigDecimal rate;
+    @JsonProperty("base_currency_name")
+    private String baseCurrencyName;
 
-    @JsonProperty("created_at")
-    private LocalDateTime createdAt;
+    private BigDecimal rate;
 }
