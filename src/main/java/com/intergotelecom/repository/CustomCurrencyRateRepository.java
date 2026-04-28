@@ -6,5 +6,5 @@ import jakarta.enterprise.context.ApplicationScoped;
 
 @ApplicationScoped
 public class CustomCurrencyRateRepository
-    implements PanacheMongoRepository<CustomCurrencyRateEntity> {
+    implements PanacheRepository<CustomCurrencyRateEntity> {
 }
