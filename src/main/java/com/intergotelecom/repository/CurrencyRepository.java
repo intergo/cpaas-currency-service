@@ -15,4 +15,8 @@ public class CurrencyRepository implements PanacheMongoRepository<CurrencyEntity
     public Optional<CurrencyEntity> findBaseCurrency() {
         return find("baseCurrency", true).firstResultOptional();
     }
+
+    public Optional<CurrencyEntity> findByCurrencyName(String currencyName) {
+        return find("currencyName", currencyName).firstResultOptional();
+    }
 }
