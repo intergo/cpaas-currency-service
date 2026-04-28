@@ -7,10 +7,12 @@ import com.intergotelecom.rest.dto.CreateCurrencyRequestDTO;
 import com.intergotelecom.rest.dto.CurrencyListResponseDTO;
 import com.intergotelecom.rest.dto.CurrencyResponseDTO;
 import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.transaction.Transactional;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 
+@Transactional
 @ApplicationScoped
 @RequiredArgsConstructor
 public class CurrencyService {
