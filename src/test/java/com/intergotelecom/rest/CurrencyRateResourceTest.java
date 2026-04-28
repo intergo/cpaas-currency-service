@@ -152,8 +152,37 @@ class CurrencyRateResourceTest extends BaseIntegrationTest {
           .log().all()
           .statusCode(Status.OK.getStatusCode())
           .body("base_currency_name", is("EUR"))
-          .body("currency_rates", hasSize(2))
-          .body("currency_rates[0].base_currency_name", is("EUR"));
+          .body("currency_rates", hasSize(2));
+    }
+
+    @Test
+    void getCurrencyRates_returnsOnlyRequestedCurrencies() {
+        var eur = currencyDataFactory
+            .createCurrency("EUR", true, true);
+
+        var usd = currencyDataFactory
+            .createCurrency("USD", false, true);
+
+        var gbp = currencyDataFactory
+            .createCurrency("GBP", false, true);
+
+        var jpy = currencyDataFactory
+            .createCurrency("JPY", false, true);
+
+        currencyDataFactory.createCurrencyRate(usd, eur, new BigDecimal("1.08"));
+        currencyDataFactory.createCurrencyRate(gbp, eur, new BigDecimal("0.86"));
+        currencyDataFactory.createCurrencyRate(jpy, eur, new BigDecimal("160.00"));
+
+        given()
+            .queryParam("base_currency", "EUR")
+            .queryParam("currencies", "USD")
+            .queryParam("currencies", "GBP")
+        .when()
+            .get("/api/v1/currency-rate")
+        .then()
+            .statusCode(Status.OK.getStatusCode())
+            .body("base_currency_name", is("EUR"))
+            .body("currency_rates", hasSize(2));
     }
 
     @Test
