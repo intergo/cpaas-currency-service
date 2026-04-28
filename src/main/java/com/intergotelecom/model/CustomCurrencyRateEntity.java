@@ -29,7 +29,7 @@ public class CustomCurrencyRateEntity {
     private Long id;
 
     @ManyToOne
-    @JoinColumn(name = "currency_id")
+    @JoinColumn(name = "currency_id", nullable = false)
     private CurrencyEntity currency;
 
     @Column(name = "rate", nullable = false)
