@@ -3,6 +3,7 @@ package com.intergotelecom.mapper;
 import com.intergotelecom.model.CurrencyEntity;
 import com.intergotelecom.model.CurrencyRateEntity;
 import com.intergotelecom.rest.dto.CurrencyRateResponseDTO;
+import com.intergotelecom.rest.dto.CurrencyRatesResponseDTO;
 import com.intergotelecom.rest.dto.UpdateCurrencyRateDTO;
 import java.util.List;
 import org.mapstruct.Mapper;
@@ -16,6 +17,10 @@ public interface CurrencyRateMapper {
     CurrencyRateResponseDTO toResponseDto(CurrencyRateEntity entity);
 
     List<CurrencyRateResponseDTO> toResponseDto(List<CurrencyRateEntity> entity);
+
+    @Mapping(target = "baseCurrencyName", source = "baseCurrency")
+    @Mapping(target = "currencyRates", source = "entity")
+    CurrencyRatesResponseDTO toResponseDto(String baseCurrency, List<CurrencyRateEntity> entity);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
