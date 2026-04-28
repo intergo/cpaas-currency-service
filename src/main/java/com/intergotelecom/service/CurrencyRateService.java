@@ -89,9 +89,11 @@ public class CurrencyRateService {
         return currencyRateMapper.toResponseDto(baseCurrencyName, rateEntities);
     }
 
-    public CurrencyRatesResponseDTO getCurrencyRates(String baseCurrencyName) {
-        List<CurrencyRateEntity> rates = currencyRateRepository.findByBaseCurrency(baseCurrencyName);
-        return currencyRateMapper.toResponseDto(baseCurrencyName, rates);
+    public CurrencyRatesResponseDTO getCurrencyRatesResponse(String baseCurrencyName, List<String> currencyNames) {
+      List<CurrencyRateEntity> rates = currencyRateRepository
+          .findByCurrencyAndBaseCurrency(baseCurrencyName, currencyNames);
+
+      return currencyRateMapper.toResponseDto(baseCurrencyName, rates);
     }
 
     private List<CurrencyRateEntity> getCurrencyRates(String baseCurrency, Set<String> currencyNames) {
