@@ -4,7 +4,7 @@ import com.intergotelecom.mapper.CurrencyRateMapper;
 import com.intergotelecom.model.CurrencyEntity;
 import com.intergotelecom.model.CurrencyRateEntity;
 import com.intergotelecom.repository.CurrencyRateRepository;
-import com.intergotelecom.rest.dto.CurrencyRateResponseDTO;
+import com.intergotelecom.rest.dto.CurrencyRatesResponseDTO;
 import com.intergotelecom.rest.dto.UpdateCurrencyRateDTO;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
@@ -29,7 +29,7 @@ public class CurrencyRateService {
     private final
     CurrencyService currencyService;
 
-    public List<CurrencyRateResponseDTO> setCurrencyRates(
+    public CurrencyRatesResponseDTO setCurrencyRates(
             String baseCurrencyName, List<UpdateCurrencyRateDTO> currencyRatesDTOs) {
         // create a map with rate DTOs
         Map<String, UpdateCurrencyRateDTO> currencyRatesMap = currencyRatesDTOs.stream()
@@ -65,7 +65,7 @@ public class CurrencyRateService {
             currencyService.getCurrenciesByName(missingCurrencyNames);
 
         if (missingCurrencies.isEmpty()) {
-            return currencyRateMapper.toResponseDto(rateEntities);
+            return currencyRateMapper.toResponseDto(baseCurrencyName, rateEntities);
         }
 
         // fetch base currency
@@ -86,7 +86,7 @@ public class CurrencyRateService {
         // create response and return
         rateEntities.addAll(newRateEntities);
 
-        return currencyRateMapper.toResponseDto(rateEntities);
+        return currencyRateMapper.toResponseDto(baseCurrencyName, rateEntities);
     }
 
     private List<CurrencyRateEntity> getCurrencyRates(String baseCurrency, Set<String> currencyNames) {
