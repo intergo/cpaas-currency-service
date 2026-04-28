@@ -10,7 +10,14 @@
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="currency_id" type="bigint">
-                <constraints nullable="false" foreignKeyName="fk_currency_rates_currency" references="currencies(id)"/>
+                <constraints nullable="false"
+                  foreignKeyName="fk_currency_rates_currency"
+                  references="currencies(id)"/>
+            </column>
+            <column name="base_currency_id" type="bigint">
+                <constraints nullable="false"
+                  foreignKeyName="fk_currency_rates_base_currency"
+                  references="currencies(id)"/>
             </column>
             <column name="rate" type="decimal(19,6)">
                 <constraints nullable="false"/>
