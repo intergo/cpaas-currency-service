@@ -7,10 +7,10 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import org.bson.codecs.pojo.annotations.BsonProperty;
 import org.bson.types.ObjectId;
 
 import java.math.BigDecimal;
-import java.time.Instant;
 
 @MongoEntity(collection = "currency_rates")
 @Getter
@@ -18,9 +18,11 @@ import java.time.Instant;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CurrencyRateEntity extends PanacheMongoEntity {
+    @BsonProperty("currency_id")
     private ObjectId currencyId;
 
     private BigDecimal rate;
 
+    @BsonProperty("created_at")
     private LocalDateTime createdAt;
 }
