@@ -4,7 +4,7 @@
         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
         xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog https://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-latest.xsd">
 
-    <include file="changelog/currency-table.xml" relativeToChangelogFile="true"/>
-    <include file="changelog/currency-rates-table.xml" relativeToChangelogFile="true"/>
-    <include file="changelog/custom-currency-rates-table.xml" relativeToChangelogFile="true"/>
+    <include file="changelog/db-changelog-currencies.xml" relativeToChangelogFile="true"/>
+    <include file="changelog/db-changelog-currency-rates.xml" relativeToChangelogFile="true"/>
+    <include file="changelog/db-changelog-custom-currency-rates.xml" relativeToChangelogFile="true"/>
 </databaseChangeLog>
