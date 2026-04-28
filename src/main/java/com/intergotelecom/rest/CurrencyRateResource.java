@@ -11,7 +11,6 @@ import jakarta.ws.rs.Path;
 import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
-import jakarta.ws.rs.core.Response.Status;
 import lombok.RequiredArgsConstructor;
 
 @RequestScoped
@@ -28,8 +27,9 @@ public class CurrencyRateResource {
         var baseCurrencyName = request.getBaseCurrencyName();
         var currencyRates = request.getCurrencyRates();
 
-        CurrencyRateResponseDTO created = currencyRateService.setCurrencyRates(baseCurrencyName, currencyRates);
+        CurrencyRatesResponseDTO responseDTO = currencyRateService
+            .setCurrencyRates(baseCurrencyName, currencyRates);
 
-        return Response.status(Status.OK).entity(created).build();
+        return Response.ok(responseDTO).build();
     }
 }
