@@ -1,15 +1,13 @@
 package com.intergotelecom.service;
 
 import com.intergotelecom.mapper.CurrencyRateMapper;
-import com.intergotelecom.model.CurrencyEntity;
-import com.intergotelecom.model.CurrencyRateEntity;
 import com.intergotelecom.repository.CurrencyRateRepository;
-import com.intergotelecom.repository.CurrencyRepository;
 import com.intergotelecom.rest.dto.CurrencyRateResponseDTO;
-import com.intergotelecom.rest.dto.UpdateCurrencyRateRequestDTO;
+import com.intergotelecom.rest.dto.UpdateCurrencyRateDTO;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.NotFoundException;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 
 @Transactional
@@ -18,10 +16,6 @@ import lombok.RequiredArgsConstructor;
 public class CurrencyRateService {
     private final
     CurrencyRateRepository currencyRateRepository;
-
-    // todo 1 repo on service
-    private final
-    CurrencyRepository currencyRepository;
 
     private final
     CurrencyRateMapper currencyRateMapper;
