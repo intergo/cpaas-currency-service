@@ -14,7 +14,7 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @AllArgsConstructor
 @SuperBuilder(toBuilder = true)
-public class UpdateCurrencyRateRequestDTO {
+public class UpdateCurrencyRateDTO {
     @NotBlank(message = "Currency name cannot be blank")
     @JsonProperty("currency_name")
     private String currencyName;
