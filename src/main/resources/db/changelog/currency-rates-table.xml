@@ -9,11 +9,4 @@
     <changeSet id="currency-rates-create-collection" author="alex">
         <ext:createCollection collectionName="currency_rates"/>
     </changeSet>
-
-    <changeSet id="currency-rates-index-currency-created-at" author="alex">
-        <ext:createIndex collectionName="currency_rates">
-            <ext:keys>{"currencyId": 1, "createdAt": -1}</ext:keys>
-            <ext:options>{"name": "idx_currency_rates_currencyId_createdAt"}</ext:options>
-        </ext:createIndex>
-    </changeSet>
 </databaseChangeLog>
