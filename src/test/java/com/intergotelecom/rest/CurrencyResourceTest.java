@@ -3,12 +3,10 @@ package com.intergotelecom.rest;
 import static io.restassured.RestAssured.given;
 
 import com.intergotelecom.config.BaseIntegrationTest;
-import com.intergotelecom.model.CurrencyEntity;
-import com.intergotelecom.repository.CurrencyRepository;
+import com.intergotelecom.factory.CurrencyDataFactory;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response.Status;
-import java.time.LocalDateTime;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -17,20 +15,17 @@ import org.junit.jupiter.api.Test;
 @RequiredArgsConstructor
 class CurrencyResourceTest extends BaseIntegrationTest {
     private final
-    CurrencyRepository currencyRepository;
+    CurrencyDataFactory currencyDataFactory;
 
     @BeforeEach
-    void clean() {
-        currencyRepository.deleteAll();
+    void setUp() {
+        currencyDataFactory.cleanDatabase();
     }
 
     @Test
     void getAvailableCurrencies() {
-        var euroCurrency = "EUR";
-        var poundCurrency = "GBP";
-
-        createCurrency(euroCurrency, true,true);
-        createCurrency(poundCurrency, false, true);
+        currencyDataFactory.createCurrency("EUR", true, true);
+        currencyDataFactory.createCurrency("GBP", false, true);
 
         given()
             .accept(MediaType.APPLICATION_JSON)
@@ -38,15 +33,5 @@ class CurrencyResourceTest extends BaseIntegrationTest {
             .get("/api/v1/currency")
         .then()
             .statusCode(Status.OK.getStatusCode());
-    }
-
-    private void createCurrency(String currencyName, boolean isBase, boolean available) {
-        var currencyEntity = new CurrencyEntity();
-        currencyEntity.setCurrencyName(currencyName);
-        currencyEntity.setBaseCurrency(isBase);
-        currencyEntity.setAvailable(available);
-        currencyEntity.setCreatedAt(LocalDateTime.now());
-
-        currencyRepository.persist(currencyEntity);
     }
 }
