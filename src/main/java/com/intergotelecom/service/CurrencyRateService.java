@@ -20,12 +20,21 @@ public class CurrencyRateService {
     private final
     CurrencyRateMapper currencyRateMapper;
 
-    public CurrencyRateResponseDTO setCurrencyRate(UpdateCurrencyRateRequestDTO dto) {
-        CurrencyEntity currency = currencyRepository.findByCurrencyName(dto.getCurrencyName())
-            .orElseThrow(() -> new NotFoundException("Currency not found: " + dto.getCurrencyName()));
+    private final
+    CurrencyService currencyService;
 
-        CurrencyRateEntity entity = currencyRateMapper.toEntity(dto);
-        entity.setCurrencyId(currency.id);
+    public CurrencyRateResponseDTO setCurrencyRates(
+        String baseCurrency, List<UpdateCurrencyRateDTO> currencyRates) {
+
+        var baseCurrencyEntity = currencyService.getBaseCurrencyOptional()
+            .orElseThrow(() -> new NotFoundException("Base currency not found: " + baseCurrency));
+
+        var currencyNames = currencyRates.stream()
+            .map(UpdateCurrencyRateDTO::getCurrencyName)
+            .distinct()
+            .toList();
+
+        var currencyEntities = currencyService.getCurrenciesByName(currencyNames);
 
         currencyRateRepository.persist(entity);
 
