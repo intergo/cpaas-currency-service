@@ -17,6 +17,7 @@ import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
+import lombok.experimental.SuperBuilder;
 
 @Entity
 @Table(name = "currency_rates")
@@ -24,6 +25,7 @@ import lombok.Setter;
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
+@SuperBuilder(toBuilder = true)
 public class CurrencyRateEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
