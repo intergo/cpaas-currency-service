@@ -9,11 +9,4 @@
     <changeSet id="create-currencies-collection" author="alex">
         <ext:createCollection collectionName="currencies"/>
     </changeSet>
-
-    <changeSet id="currencies-currency-name-index" author="alex">
-        <ext:createIndex collectionName="currencies">
-            <ext:keys>{"currencyName": 1}</ext:keys>
-            <ext:options>{"name": "idx_currencies_currencyName"}</ext:options>
-        </ext:createIndex>
-    </changeSet>
 </databaseChangeLog>
