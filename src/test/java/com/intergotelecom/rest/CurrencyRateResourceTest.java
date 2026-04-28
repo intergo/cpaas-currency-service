@@ -132,4 +132,41 @@ class CurrencyRateResourceTest extends BaseIntegrationTest {
         .then()
             .statusCode(Status.BAD_REQUEST.getStatusCode());
     }
+
+    @Test
+    void getCurrencyRates_returnsRatesForBaseCurrency() {
+      // create currencies
+      var eur = currencyDataFactory.createCurrency("EUR", true, true);
+      var usd = currencyDataFactory.createCurrency("USD", false, true);
+      var gbp = currencyDataFactory.createCurrency("GBP", false, true);
+
+      // create rates
+      currencyDataFactory.createCurrencyRate(usd, eur, new BigDecimal("1.08"));
+      currencyDataFactory.createCurrencyRate(gbp, eur, new BigDecimal("0.86"));
+
+      given()
+          .queryParam("base_currency", "EUR")
+      .when()
+          .get("/api/v1/currency-rate")
+      .then()
+          .log().all()
+          .statusCode(Status.OK.getStatusCode())
+          .body("base_currency_name", is("EUR"))
+          .body("currency_rates", hasSize(2))
+          .body("currency_rates[0].base_currency_name", is("EUR"));
+    }
+
+    @Test
+    void getCurrencyRates_returnsEmptyList_whenNoRatesExist() {
+      currencyDataFactory.createCurrency("EUR", true, true);
+
+      given()
+          .queryParam("base_currency", "EUR")
+      .when()
+          .get("/api/v1/currency-rate")
+      .then()
+          .statusCode(Status.OK.getStatusCode())
+          .body("base_currency_name", is("EUR"))
+          .body("currency_rates", hasSize(0));
+    }
 }
