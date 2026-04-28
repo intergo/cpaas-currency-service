@@ -13,6 +13,7 @@ import jakarta.ws.rs.Produces;
 import jakarta.ws.rs.QueryParam;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 
 @RequestScoped
@@ -24,8 +25,12 @@ public class CurrencyRateResource {
 
     @GET
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getCurrencyRates(@QueryParam("base_currency") String baseCurrencyName) {
-        CurrencyRatesResponseDTO responseDTO = currencyRateService.getCurrencyRates(baseCurrencyName);
+    public Response getCurrencyRates(
+            @QueryParam("base_currency") String baseCurrencyName,
+            @QueryParam("currencies") List<String> currencies) {
+        CurrencyRatesResponseDTO responseDTO = currencyRateService
+            .getCurrencyRatesResponse(baseCurrencyName, currencies);
+
         return Response.ok(responseDTO).build();
     }
 
