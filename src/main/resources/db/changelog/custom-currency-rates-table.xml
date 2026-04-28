@@ -9,18 +9,4 @@
     <changeSet id="custom-currency-rates-create-collection" author="alex">
         <ext:createCollection collectionName="custom_currency_rates"/>
     </changeSet>
-
-    <changeSet id="custom-currency-rates-index-currency-created-at" author="alex">
-        <ext:createIndex collectionName="custom_currency_rates">
-            <ext:keys>{"currencyId": 1, "createdAt": -1}</ext:keys>
-            <ext:options>{"name": "idx_custom_currency_rates_currencyId_createdAt"}</ext:options>
-        </ext:createIndex>
-    </changeSet>
-
-    <changeSet id="custom-currency-rates-index-user-id" author="alex">
-        <ext:createIndex collectionName="custom_currency_rates">
-            <ext:keys>{"userId": 1}</ext:keys>
-            <ext:options>{"name": "idx_custom_currency_rates_userId"}</ext:options>
-        </ext:createIndex>
-    </changeSet>
 </databaseChangeLog>
