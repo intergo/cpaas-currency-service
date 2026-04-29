@@ -47,7 +47,6 @@ class CurrencyRateResourceTest extends BaseIntegrationTest {
 
         // update usd and gbp rates
         var request = UpdateCurrencyRatesRequestDTO.builder()
-            .baseCurrencyName("EUR")
             .currencyRates(List.of(usdRate, gbpRate))
             .build();
 
@@ -81,7 +80,6 @@ class CurrencyRateResourceTest extends BaseIntegrationTest {
             .build();
 
         var request = UpdateCurrencyRatesRequestDTO.builder()
-            .baseCurrencyName("EUR")
             .currencyRates(List.of(usdRate, gbpRate))
             .build();
 
@@ -99,7 +97,6 @@ class CurrencyRateResourceTest extends BaseIntegrationTest {
     @Test
     void setCurrencyRates_returnsBadRequest_whenRatesListEmpty() {
         var request = UpdateCurrencyRatesRequestDTO.builder()
-            .baseCurrencyName("EUR")
             .currencyRates(List.of())
             .build();
 
