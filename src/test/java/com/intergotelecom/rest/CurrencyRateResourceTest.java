@@ -47,7 +47,6 @@ class CurrencyRateResourceTest extends BaseIntegrationTest {
 
         // update usd and gbp rates
         var request = UpdateCurrencyRatesRequestDTO.builder()
-            .baseCurrencyName("EUR")
             .currencyRates(List.of(usdRate, gbpRate))
             .build();
 
@@ -57,7 +56,6 @@ class CurrencyRateResourceTest extends BaseIntegrationTest {
         .when()
             .post("/api/v1/currency-rate")
         .then()
-            .log().all()
             .statusCode(Status.OK.getStatusCode())
             .body("base_currency_name", is("EUR"))
             .body("currency_rates", hasSize(request.getCurrencyRates().size()));
@@ -81,7 +79,6 @@ class CurrencyRateResourceTest extends BaseIntegrationTest {
             .build();
 
         var request = UpdateCurrencyRatesRequestDTO.builder()
-            .baseCurrencyName("EUR")
             .currencyRates(List.of(usdRate, gbpRate))
             .build();
 
@@ -99,29 +96,7 @@ class CurrencyRateResourceTest extends BaseIntegrationTest {
     @Test
     void setCurrencyRates_returnsBadRequest_whenRatesListEmpty() {
         var request = UpdateCurrencyRatesRequestDTO.builder()
-            .baseCurrencyName("EUR")
             .currencyRates(List.of())
-            .build();
-
-        given()
-            .contentType(MediaType.APPLICATION_JSON)
-            .body(request)
-        .when()
-            .post("/api/v1/currency-rate")
-        .then()
-            .statusCode(Status.BAD_REQUEST.getStatusCode());
-    }
-
-    @Test
-    void setCurrencyRates_returnsBadRequest_whenBaseCurrencyBlank() {
-        var usdRate = UpdateCurrencyRateDTO.builder()
-            .currencyName("USD")
-            .rate(new BigDecimal("1.08"))
-            .build();
-
-        var request = UpdateCurrencyRatesRequestDTO.builder()
-            .baseCurrencyName("")
-            .currencyRates(List.of(usdRate))
             .build();
 
         given()
@@ -145,11 +120,12 @@ class CurrencyRateResourceTest extends BaseIntegrationTest {
       currencyDataFactory.createCurrencyRate(gbp, eur, new BigDecimal("0.86"));
 
       given()
-          .queryParam("base_currency", "EUR")
+          .accept(MediaType.APPLICATION_JSON)
       .when()
+          .queryParam("currencies", "USD")
+          .queryParam("currencies", "GBP")
           .get("/api/v1/currency-rate")
       .then()
-          .log().all()
           .statusCode(Status.OK.getStatusCode())
           .body("base_currency_name", is("EUR"))
           .body("currency_rates", hasSize(2));

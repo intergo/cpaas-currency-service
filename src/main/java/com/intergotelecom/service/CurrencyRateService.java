@@ -40,8 +40,10 @@ public class CurrencyRateService {
     @ConfigProperty(name = "currency.rate.cache.ttl", defaultValue = "3600")
     private long cacheTtlSeconds;
 
-    public CurrencyRatesResponseDTO setCurrencyRates(
-            String baseCurrencyName, List<UpdateCurrencyRateDTO> currencyRatesDTOs) {
+    @ConfigProperty(name = "app.base-currency", defaultValue = "EUR")
+    private String baseCurrencyName;
+
+    public CurrencyRatesResponseDTO setCurrencyRates(List<UpdateCurrencyRateDTO> currencyRatesDTOs) {
         // create a map with rate DTOs
         Map<String, UpdateCurrencyRateDTO> currencyRatesMap = currencyRatesDTOs.stream()
             .collect(Collectors.toMap(
@@ -111,7 +113,7 @@ public class CurrencyRateService {
         return currencyRateMapper.toResponseDto(baseCurrencyName, domainDTOs);
     }
 
-    public CurrencyRatesResponseDTO getCurrencyRatesResponse(String baseCurrencyName, List<String> requestedCurrencies) {
+    public CurrencyRatesResponseDTO getCurrencyRatesResponse(List<String> requestedCurrencies) {
       List<CurrencyDomainDTO> cachedDTOList = requestedCurrencies.stream()
           .map(currency -> {
             String key = RedisKeys.createCurrencyKey(baseCurrencyName, currency);
