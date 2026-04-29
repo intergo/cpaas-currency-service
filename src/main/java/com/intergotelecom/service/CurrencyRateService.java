@@ -157,12 +157,13 @@ public class CurrencyRateService {
           baseCurrency, currencyNames);
     }
 
-    private void cacheRates(String baseCurrencyName, List<CurrencyDomainDTO> dtos) {
+    private void cacheRates(List<CurrencyDomainDTO> DTOs) {
       Duration ttl = Duration.ofSeconds(cacheTtlSeconds);
+      DTOs.forEach(dto -> cacheRates(ttl, dto));
+    }
 
-      dtos.forEach(dto -> {
-        String key = RedisKeys.createCurrencyKey(baseCurrencyName, dto.getCurrency());
+    private void cacheRates(Duration ttl, CurrencyDomainDTO dto) {
+        String key = RedisKeys.createCurrencyKey(dto.getBaseCurrency(), dto.getCurrency());
         redisService.cacheObject(key, ttl, dto);
-      });
     }
 }
