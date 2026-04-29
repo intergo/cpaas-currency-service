@@ -6,5 +6,4 @@
 
     <include file="changelog/db-changelog-currencies.xml" relativeToChangelogFile="true"/>
     <include file="changelog/db-changelog-currency-rates.xml" relativeToChangelogFile="true"/>
-    <include file="changelog/db-changelog-custom-currency-rates.xml" relativeToChangelogFile="true"/>
 </databaseChangeLog>
