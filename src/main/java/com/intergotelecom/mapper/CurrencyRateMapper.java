@@ -5,7 +5,7 @@ import com.intergotelecom.model.CurrencyRateEntity;
 import com.intergotelecom.rest.dto.CurrencyRateResponseDTO;
 import com.intergotelecom.rest.dto.CurrencyRatesResponseDTO;
 import com.intergotelecom.rest.dto.UpdateCurrencyRateDTO;
-import com.intergotelecom.service.dto.CurrencyRedisDTO;
+import com.intergotelecom.service.dto.CurrencyDomainDTO;
 import java.util.List;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -13,23 +13,22 @@ import org.mapstruct.MappingConstants.ComponentModel;
 
 @Mapper(componentModel = ComponentModel.CDI)
 public interface CurrencyRateMapper {
-    @Mapping(target = "currencyName", source = "currency.currencyName")
-    CurrencyRateResponseDTO toResponseDto(CurrencyRateEntity entity);
+    @Mapping(target = "currencyName", source = "currency")
+    @Mapping(target = "rate", source = "rate")
+    CurrencyRateResponseDTO toResponseDto(CurrencyDomainDTO domainDTO);
 
-    List<CurrencyRateResponseDTO> toResponseDto(List<CurrencyRateEntity> entity);
+    List<CurrencyRateResponseDTO> toResponseDto(List<CurrencyDomainDTO> dtos);
 
     @Mapping(target = "baseCurrencyName", source = "baseCurrency")
-    @Mapping(target = "currencyRates", source = "entity")
-    CurrencyRatesResponseDTO toResponseDto(String baseCurrency, List<CurrencyRateEntity> entity);
+    @Mapping(target = "currencyRates", source = "dtos")
+    CurrencyRatesResponseDTO toResponseDto(String baseCurrency, List<CurrencyDomainDTO> dtos);
 
-    @Mapping(target = "baseCurrency", source = "baseCurrency")
-    @Mapping(target = "rate", source = "dto.rate")
-    @Mapping(target = "currency", source = "dto.currencyName")
-    CurrencyRedisDTO toRedisDTO(
-        String baseCurrency, UpdateCurrencyRateDTO dto);
+    @Mapping(target = "baseCurrency", source = "baseCurrency.currencyName")
+    @Mapping(target = "rate", source = "rate")
+    @Mapping(target = "currency", source = "currency.currencyName")
+    CurrencyDomainDTO toDomainDTO(CurrencyRateEntity entity);
 
-    List<CurrencyRedisDTO> toRedisDTO(
-        String baseCurrency, List<UpdateCurrencyRateDTO> dto);
+    List<CurrencyDomainDTO> toDomainDTO(List<CurrencyRateEntity> entities);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
