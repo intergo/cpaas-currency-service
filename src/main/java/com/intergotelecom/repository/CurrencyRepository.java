@@ -18,6 +18,12 @@ public class CurrencyRepository implements PanacheRepository<CurrencyEntity> {
       );
     }
 
+    public Optional<CurrencyEntity> findAvailableByName(String currencyName) {
+      return find("currencyName = ?1 and available = ?2 and baseCurrency = ?3",
+          currencyName, true, false
+      ).firstResultOptional();
+    }
+
     public Optional<CurrencyEntity> findBaseCurrency() {
         return find("baseCurrency", true).firstResultOptional();
     }
