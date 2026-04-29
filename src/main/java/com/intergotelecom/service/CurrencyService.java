@@ -54,6 +54,10 @@ public class CurrencyService {
       return currencyRepository.findAvailableByName(currencyNames);
     }
 
+    public Optional<CurrencyEntity> getCurrencyByName(String currencyName) {
+      return currencyRepository.findAvailableByName(currencyName);
+    }
+
     public Optional<CurrencyEntity> getBaseCurrencyOptional() {
       return currencyRepository.findBaseCurrency();
     }
