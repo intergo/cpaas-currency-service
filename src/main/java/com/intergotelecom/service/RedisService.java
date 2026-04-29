@@ -54,4 +54,13 @@ public class RedisService<T> {
       log.error("[REDIS_SERVICE] Error while caching object for key: {} [FAIL]", key, e);
     }
   }
+
+  public void deleteObject(String key) {
+    try {
+      log.info("[REDIS_SERVICE] Deleting cached object for key: {}", key);
+      redisDataSource.key().del(key);
+    } catch (Exception e) {
+      log.error("[REDIS_SERVICE] Error while deleting cached object for key: {} [FAIL]", key, e);
+    }
+  }
 }
