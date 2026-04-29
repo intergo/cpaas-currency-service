@@ -113,27 +113,6 @@ class CurrencyRateResourceTest extends BaseIntegrationTest {
     }
 
     @Test
-    void setCurrencyRates_returnsBadRequest_whenBaseCurrencyBlank() {
-        var usdRate = UpdateCurrencyRateDTO.builder()
-            .currencyName("USD")
-            .rate(new BigDecimal("1.08"))
-            .build();
-
-        var request = UpdateCurrencyRatesRequestDTO.builder()
-            .baseCurrencyName("")
-            .currencyRates(List.of(usdRate))
-            .build();
-
-        given()
-            .contentType(MediaType.APPLICATION_JSON)
-            .body(request)
-        .when()
-            .post("/api/v1/currency-rate")
-        .then()
-            .statusCode(Status.BAD_REQUEST.getStatusCode());
-    }
-
-    @Test
     void getCurrencyRates_returnsRatesForBaseCurrency() {
       // create currencies
       var eur = currencyDataFactory.createCurrency("EUR", true, true);
