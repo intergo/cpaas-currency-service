@@ -19,6 +19,7 @@
         <lombok.version>1.18.42</lombok.version>
         <mapstruct.version>1.6.3</mapstruct.version>
         <testcontainers.version>1.21.4</testcontainers.version>
+        <testcontainers-redis.version>2.2.2</testcontainers-redis.version>
     </properties>
 
     <dependencyManagement>
@@ -94,10 +95,10 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.testcontainers</groupId>
-            <artifactId>redis</artifactId>
-            <version>${testcontainers.version}</version>
-            <scope>test</scope>
+          <groupId>com.redis</groupId>
+          <artifactId>testcontainers-redis</artifactId>
+          <version>${testcontainers-redis.version}</version>
+          <scope>test</scope>
         </dependency>
     </dependencies>
 
