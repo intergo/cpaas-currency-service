@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public enum RateProviderEnum {
   ECB("ecb"),
-  BACKOFFICE("backoffice");
+  CUSTOM("custom");
 
   private final String value;
 }
