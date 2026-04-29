@@ -7,13 +7,14 @@ import com.intergotelecom.model.CurrencyRateEntity;
 import com.intergotelecom.repository.CurrencyRateRepository;
 import com.intergotelecom.rest.dto.CurrencyRatesResponseDTO;
 import com.intergotelecom.rest.dto.UpdateCurrencyRateDTO;
-import com.intergotelecom.service.dto.CurrencyRedisDTO;
+import com.intergotelecom.service.dto.CurrencyDomainDTO;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.NotFoundException;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -34,7 +35,7 @@ public class CurrencyRateService {
     CurrencyService currencyService;
 
     private final
-    RedisService<CurrencyRedisDTO> redisService;
+    RedisService<CurrencyDomainDTO> redisService;
 
     @ConfigProperty(name = "currency.rate.cache.ttl", defaultValue = "3600")
     private long cacheTtlSeconds;
@@ -75,7 +76,13 @@ public class CurrencyRateService {
             currencyService.getCurrenciesByName(missingCurrencyNames);
 
         if (missingCurrencies.isEmpty()) {
-            return currencyRateMapper.toResponseDto(baseCurrencyName, rateEntities);
+            // cache currency rates to redis
+            List<CurrencyDomainDTO> domainDTOs = currencyRateMapper
+                .toDomainDTO(rateEntities);
+
+            cacheRates(baseCurrencyName, domainDTOs);
+
+            return currencyRateMapper.toResponseDto(baseCurrencyName, domainDTOs);
         }
 
         // fetch base currency
@@ -97,17 +104,47 @@ public class CurrencyRateService {
         rateEntities.addAll(newRateEntities);
 
         // cache currency rates to redis
-        List<CurrencyRedisDTO> redisDTOs = currencyRateMapper.toRedisDTO(baseCurrencyName, currencyRatesDTOs);
-        cacheRates(baseCurrencyName, redisDTOs);
+        List<CurrencyDomainDTO> domainDTOs = currencyRateMapper.toDomainDTO(rateEntities);
 
-        return currencyRateMapper.toResponseDto(baseCurrencyName, rateEntities);
+        cacheRates(baseCurrencyName, domainDTOs);
+
+        return currencyRateMapper.toResponseDto(baseCurrencyName, domainDTOs);
     }
 
-    public CurrencyRatesResponseDTO getCurrencyRatesResponse(String baseCurrencyName, List<String> currencyNames) {
-      List<CurrencyRateEntity> rates = currencyRateRepository
-          .findByCurrencyAndBaseCurrency(baseCurrencyName, currencyNames);
+    public CurrencyRatesResponseDTO getCurrencyRatesResponse(String baseCurrencyName, List<String> requestedCurrencies) {
+      List<CurrencyDomainDTO> cachedDTOList = requestedCurrencies.stream()
+          .map(currency -> {
+            String key = RedisKeys.createCurrencyKey(baseCurrencyName, currency);
+            return redisService.getCachedObject(key);
+          })
+          .filter(Optional::isPresent)
+          .map(Optional::get)
+          .collect(Collectors.toList());
 
-      return currencyRateMapper.toResponseDto(baseCurrencyName, rates);
+      List<String> foundCurrencies = cachedDTOList.stream()
+          .map(CurrencyDomainDTO::getCurrency)
+          .toList();
+
+      List<String> missingCurrencies = requestedCurrencies.stream()
+          .filter(currency -> !foundCurrencies.contains(currency))
+          .toList();
+
+      if (missingCurrencies.isEmpty()) {
+        return currencyRateMapper.toResponseDto(baseCurrencyName, cachedDTOList);
+      }
+
+      List<CurrencyRateEntity> rateEntities = getCurrencyRates(
+          baseCurrencyName, missingCurrencies);
+
+      // cache currency rates to redis
+      List<CurrencyDomainDTO> domainDTOs = currencyRateMapper
+          .toDomainDTO(rateEntities);
+
+      cacheRates(baseCurrencyName, domainDTOs);
+
+      cachedDTOList.addAll(domainDTOs);
+
+      return currencyRateMapper.toResponseDto(baseCurrencyName, cachedDTOList);
     }
 
     private List<CurrencyRateEntity> getCurrencyRates(String baseCurrency, Set<String> currencyNames) {
@@ -115,7 +152,12 @@ public class CurrencyRateService {
           baseCurrency, currencyNames);
     }
 
-    private void cacheRates(String baseCurrencyName, List<CurrencyRedisDTO> dtos) {
+    private List<CurrencyRateEntity> getCurrencyRates(String baseCurrency, List<String> currencyNames) {
+      return currencyRateRepository.findByCurrencyAndBaseCurrency(
+          baseCurrency, currencyNames);
+    }
+
+    private void cacheRates(String baseCurrencyName, List<CurrencyDomainDTO> dtos) {
       Duration ttl = Duration.ofSeconds(cacheTtlSeconds);
 
       dtos.forEach(dto -> {
