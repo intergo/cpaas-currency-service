@@ -9,7 +9,7 @@ import lombok.experimental.SuperBuilder;
 @Setter
 @AllArgsConstructor
 @SuperBuilder(toBuilder = true)
-public class CurrencyRedisDTO {
+public class CurrencyDomainDTO {
     private String baseCurrency;
     private String currency;
     private String rate;
