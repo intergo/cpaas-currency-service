@@ -22,6 +22,9 @@
             <column name="rate" type="decimal(19,6)">
                 <constraints nullable="false"/>
             </column>
+            <column name="rate" type="varchar(50)">
+                <constraints nullable="false"/>
+            </column>
             <column name="created_at" type="timestamp">
                 <constraints nullable="false"/>
             </column>

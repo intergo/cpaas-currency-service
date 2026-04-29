@@ -1,7 +1,10 @@
 package com.intergotelecom.model;
 
+import com.intergotelecom.enums.RateProviderEnum;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -40,6 +43,10 @@ public class CurrencyRateEntity {
 
     @Column(name = "rate", nullable = false)
     private BigDecimal rate;
+
+    @Enumerated(EnumType.STRING)
+    @Column(name = "rate_provider", nullable = false)
+    private RateProviderEnum rateProvider;
 
     @Column(name = "created_at", nullable = false)
     private LocalDateTime createdAt;
