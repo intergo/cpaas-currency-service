@@ -1,5 +1,6 @@
 package com.intergotelecom.factory;
 
+import com.intergotelecom.enums.RateProviderEnum;
 import com.intergotelecom.model.CurrencyEntity;
 import com.intergotelecom.model.CurrencyRateEntity;
 import com.intergotelecom.repository.CurrencyRateRepository;
@@ -38,11 +39,13 @@ public class CurrencyDataFactory {
 
     @Transactional
     public CurrencyRateEntity createCurrencyRate(
-            CurrencyEntity currency, CurrencyEntity baseCurrency, BigDecimal rate) {
+            CurrencyEntity currency, CurrencyEntity baseCurrency,
+            BigDecimal rate, RateProviderEnum rateProvider) {
         var entity = CurrencyRateEntity.builder()
             .currency(currency)
             .baseCurrency(baseCurrency)
             .rate(rate)
+            .rateProvider(rateProvider)
             .build();
 
         currencyRateRepository.persist(entity);
