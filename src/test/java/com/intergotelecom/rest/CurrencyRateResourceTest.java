@@ -56,7 +56,6 @@ class CurrencyRateResourceTest extends BaseIntegrationTest {
         .when()
             .post("/api/v1/currency-rate")
         .then()
-            .log().all()
             .statusCode(Status.OK.getStatusCode())
             .body("base_currency_name", is("EUR"))
             .body("currency_rates", hasSize(request.getCurrencyRates().size()));
@@ -121,11 +120,12 @@ class CurrencyRateResourceTest extends BaseIntegrationTest {
       currencyDataFactory.createCurrencyRate(gbp, eur, new BigDecimal("0.86"));
 
       given()
-          .queryParam("base_currency", "EUR")
+          .accept(MediaType.APPLICATION_JSON)
       .when()
+          .queryParam("currencies", "USD")
+          .queryParam("currencies", "GBP")
           .get("/api/v1/currency-rate")
       .then()
-          .log().all()
           .statusCode(Status.OK.getStatusCode())
           .body("base_currency_name", is("EUR"))
           .body("currency_rates", hasSize(2));
