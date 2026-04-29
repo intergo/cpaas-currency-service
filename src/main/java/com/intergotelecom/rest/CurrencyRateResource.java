@@ -26,10 +26,9 @@ public class CurrencyRateResource {
     @GET
     @Produces(MediaType.APPLICATION_JSON)
     public Response getCurrencyRates(
-            @QueryParam("base_currency") String baseCurrencyName,
             @QueryParam("currencies") List<String> currencies) {
         CurrencyRatesResponseDTO responseDTO = currencyRateService
-            .getCurrencyRatesResponse(baseCurrencyName, currencies);
+            .getCurrencyRatesResponse(currencies);
 
         return Response.ok(responseDTO).build();
     }
@@ -38,11 +37,10 @@ public class CurrencyRateResource {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     public Response setCurrencyRates(@Valid UpdateCurrencyRatesRequestDTO request) {
-        var baseCurrencyName = request.getBaseCurrencyName();
         var currencyRates = request.getCurrencyRates();
 
         CurrencyRatesResponseDTO responseDTO = currencyRateService
-            .setCurrencyRates(baseCurrencyName, currencyRates);
+            .setCurrencyRates(currencyRates);
 
         return Response.ok(responseDTO).build();
     }
