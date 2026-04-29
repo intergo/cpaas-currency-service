@@ -1,5 +1,6 @@
 package com.intergotelecom.mapper;
 
+import com.intergotelecom.enums.RateProviderEnum;
 import com.intergotelecom.model.CurrencyEntity;
 import com.intergotelecom.model.CurrencyRateEntity;
 import com.intergotelecom.rest.dto.CurrencyRateResponseDTO;
@@ -34,10 +35,12 @@ public interface CurrencyRateMapper {
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "rate", source = "dto.rate")
+    @Mapping(target = "rateProvider", source = "rateProvider")
     @Mapping(target = "currency", source = "currencyEntity")
     @Mapping(target = "baseCurrency", source = "baseCurrencyEntity")
     CurrencyRateEntity toEntity(
         UpdateCurrencyRateDTO dto,
+        RateProviderEnum rateProvider,
         CurrencyEntity currencyEntity,
         CurrencyEntity baseCurrencyEntity);
 }
