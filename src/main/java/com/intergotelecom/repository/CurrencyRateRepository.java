@@ -11,12 +11,6 @@ import java.util.Set;
 @ApplicationScoped
 public class CurrencyRateRepository implements PanacheRepository<CurrencyRateEntity> {
     public List<CurrencyRateEntity> findByCurrencyBaseCurrencyAndProvider(
-        String baseCurrency, Set<String> currencyNames, RateProviderEnum rateProvider) {
-      return findByCurrencyBaseCurrencyAndProvider(
-          baseCurrency, List.copyOf(currencyNames), rateProvider);
-    }
-
-    public List<CurrencyRateEntity> findByCurrencyBaseCurrencyAndProvider(
         String baseCurrency, List<String> currencyNames, RateProviderEnum rateProvider) {
       return list("baseCurrency.currencyName = ?1 "
               + "and currency.currencyName in ?2 "

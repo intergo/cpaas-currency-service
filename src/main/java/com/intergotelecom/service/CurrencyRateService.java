@@ -16,7 +16,6 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
@@ -51,7 +50,8 @@ public class CurrencyRateService {
                 UpdateCurrencyRateDTO::getCurrencyName,
                 Function.identity()));
 
-        Set<String> currenciesToUpdate = currencyRatesMap.keySet();
+        // get currency names list
+        List<String> currenciesToUpdate = currencyRatesMap.keySet().stream().distinct().toList();
 
         // fetch existing rate entities
         List<CurrencyRateEntity> rateEntities = getCurrencyRates(
@@ -105,10 +105,8 @@ public class CurrencyRateService {
         // create response and return
         rateEntities.addAll(newRateEntities);
 
-        List<String> updatedCurrenciesList = currenciesToUpdate.stream().toList();
-
         // cache currency rates to redis
-        List<CurrencyDomainDTO> domainDTOs = fetchAndCacheCurrencies(updatedCurrenciesList);
+        List<CurrencyDomainDTO> domainDTOs = fetchAndCacheCurrencies(currenciesToUpdate);
 
         return currencyRateMapper.toResponseDto(baseCurrencyName, domainDTOs);
     }
@@ -175,12 +173,6 @@ public class CurrencyRateService {
       cacheRate(domainDTO);
 
       return currencyRateMapper.toResponseDto(baseCurrencyName, List.of(domainDTO));
-    }
-
-    private List<CurrencyRateEntity> getCurrencyRates(
-        String baseCurrency, RateProviderEnum rateProvider, Set<String> currencyNames) {
-      return currencyRateRepository.findByCurrencyBaseCurrencyAndProvider(
-          baseCurrency, currencyNames, rateProvider);
     }
 
     private List<CurrencyRateEntity> getCurrencyRates(
