@@ -233,5 +233,50 @@ class CurrencyRateResourceTest extends BaseIntegrationTest {
           .body("base_currency_name", is("EUR"))
           .body("currency_rates", hasSize(1))
           .body("currency_rates[0].rate", is(customRateRequest.getRate().floatValue()));
-  }
+    }
+
+    @Test
+    void deleteCustomRate_removesBackofficeRate() {
+        var eur = currencyDataFactory
+            .createCurrency("EUR", true, true);
+
+        var usd = currencyDataFactory
+            .createCurrency("USD", false, true);
+
+        var usdEcbRate = BigDecimal.valueOf(1.08);
+        var usdCustomRate = BigDecimal.valueOf(1.20);
+
+        // create ECB and CUSTOM rates
+        currencyDataFactory.createCurrencyRate(
+            eur, usd, RateProviderEnum.ECB, usdEcbRate);
+
+        currencyDataFactory.createCurrencyRate(
+            eur, usd, RateProviderEnum.CUSTOM, usdCustomRate);
+
+        given()
+            .basePath("/api/v1/currency-rate")
+            .contentType(MediaType.APPLICATION_JSON)
+            .queryParam("currency", "USD")
+        .when()
+            .delete("/custom")
+        .then()
+            .statusCode(Status.OK.getStatusCode())
+            .body("base_currency_name", is("EUR"))
+            .body("currency_rates", hasSize(1))
+            .body("currency_rates[0].rate", is(usdCustomRate.floatValue()));
+    }
+
+    @Test
+    void deleteCustomRate_returnsNotFound_whenNoCustomRateExists() {
+        currencyDataFactory.createCurrency("EUR", true, true);
+        currencyDataFactory.createCurrency("USD", false, true);
+
+        given()
+            .basePath("/api/v1/currency-rate")
+            .queryParam("currency", "USD")
+        .when()
+            .delete("/custom")
+        .then()
+            .statusCode(Status.NOT_FOUND.getStatusCode());
+    }
 }
