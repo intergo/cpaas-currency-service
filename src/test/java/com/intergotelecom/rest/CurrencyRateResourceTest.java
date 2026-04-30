@@ -1,6 +1,8 @@
 package com.intergotelecom.rest;
 
+import static com.intergotelecom.enums.ErrorCodeEnum.BASE_CURRENCY_NOT_FOUND;
 import static com.intergotelecom.enums.ErrorCodeEnum.CURRENCY_NOT_FOUND;
+import static com.intergotelecom.enums.ErrorCodeEnum.CUSTOM_RATE_NOT_FOUND;
 import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasSize;
@@ -301,6 +303,29 @@ class CurrencyRateResourceTest extends BaseIntegrationTest {
     }
 
     @Test
+    void setCustomRate_returnsNotFound_whenBaseCurrencyDoesNotExist() {
+      currencyDataFactory.createCurrency("USD", false, true);
+
+      var customRateRequest = UpdateCurrencyRateDTO.builder()
+          .currencyName("USD")
+          .rate(new BigDecimal("1.50"))
+          .build();
+
+      given()
+          .basePath("/api/v1/currency-rate")
+          .contentType(MediaType.APPLICATION_JSON)
+          .body(customRateRequest)
+      .when()
+          .post("/custom")
+      .then()
+          .statusCode(Status.NOT_FOUND.getStatusCode())
+          .body("status", is(Status.NOT_FOUND.getStatusCode()))
+          .body("error_code", is(BASE_CURRENCY_NOT_FOUND.name()))
+          .body("message", containsString(BASE_CURRENCY_NOT_FOUND.getValue()))
+          .body("timestamp", notNullValue());
+    }
+
+    @Test
     void deleteCustomRate_removesBackofficeRate() {
         var eur = currencyDataFactory
             .createCurrency("EUR", true, true);
@@ -342,6 +367,10 @@ class CurrencyRateResourceTest extends BaseIntegrationTest {
         .when()
             .delete("/custom")
         .then()
-            .statusCode(Status.NOT_FOUND.getStatusCode());
+            .statusCode(Status.NOT_FOUND.getStatusCode())
+            .body("status", is(Status.NOT_FOUND.getStatusCode()))
+            .body("error_code", is(CUSTOM_RATE_NOT_FOUND.name()))
+            .body("message", containsString(CUSTOM_RATE_NOT_FOUND.getValue()))
+            .body("timestamp", notNullValue());
     }
 }
