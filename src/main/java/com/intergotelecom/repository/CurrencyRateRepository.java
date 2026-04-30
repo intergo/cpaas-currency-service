@@ -6,7 +6,6 @@ import io.quarkus.hibernate.orm.panache.PanacheRepository;
 import jakarta.enterprise.context.ApplicationScoped;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 
 @ApplicationScoped
 public class CurrencyRateRepository implements PanacheRepository<CurrencyRateEntity> {
@@ -32,10 +31,5 @@ public class CurrencyRateRepository implements PanacheRepository<CurrencyRateEnt
               + "and rateProvider = ?3",
           baseCurrency, currencyName, rateProvider)
           .firstResultOptional();
-    }
-
-    public List<CurrencyRateEntity> findByBaseCurrency(String baseCurrencyName) {
-      return list("baseCurrency.currencyName = ?1 and currency.available = ?2",
-          baseCurrencyName, true);
     }
 }
