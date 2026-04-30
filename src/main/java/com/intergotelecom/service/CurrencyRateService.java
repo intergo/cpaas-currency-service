@@ -1,5 +1,6 @@
 package com.intergotelecom.service;
 
+import com.intergotelecom.enums.RateProviderEnum;
 import com.intergotelecom.enums.RedisKeys;
 import com.intergotelecom.mapper.CurrencyRateMapper;
 import com.intergotelecom.model.CurrencyEntity;
@@ -54,7 +55,7 @@ public class CurrencyRateService {
 
         // fetch existing rate entities
         List<CurrencyRateEntity> rateEntities = getCurrencyRates(
-            baseCurrencyName, currenciesToUpdate);
+            baseCurrencyName, RateProviderEnum.ECB, currenciesToUpdate);
 
         List<String> currenciesWithRate = rateEntities.stream()
             .map(rateEntity ->
@@ -82,7 +83,7 @@ public class CurrencyRateService {
             List<CurrencyDomainDTO> domainDTOs = currencyRateMapper
                 .toDomainDTO(rateEntities);
 
-            cacheRates(baseCurrencyName, domainDTOs);
+            cacheRate(domainDTOs);
 
             return currencyRateMapper.toResponseDto(baseCurrencyName, domainDTOs);
         }
@@ -95,7 +96,8 @@ public class CurrencyRateService {
         List<CurrencyRateEntity> newRateEntities = missingCurrencies.stream()
             .map(currencyEntity -> {
               UpdateCurrencyRateDTO rateDTO = currencyRatesMap.get(currencyEntity.getCurrencyName());
-              return currencyRateMapper.toEntity(rateDTO, currencyEntity, baseCurrencyEntity);
+              return currencyRateMapper.toEntity(
+                  rateDTO, RateProviderEnum.ECB, currencyEntity, baseCurrencyEntity);
           })
           .toList();
 
@@ -108,7 +110,7 @@ public class CurrencyRateService {
         // cache currency rates to redis
         List<CurrencyDomainDTO> domainDTOs = currencyRateMapper.toDomainDTO(rateEntities);
 
-        cacheRates(baseCurrencyName, domainDTOs);
+        cacheRate(domainDTOs);
 
         return currencyRateMapper.toResponseDto(baseCurrencyName, domainDTOs);
     }
@@ -136,35 +138,42 @@ public class CurrencyRateService {
       }
 
       List<CurrencyRateEntity> rateEntities = getCurrencyRates(
-          baseCurrencyName, missingCurrencies);
+          baseCurrencyName, RateProviderEnum.ECB, missingCurrencies);
 
       // cache currency rates to redis
       List<CurrencyDomainDTO> domainDTOs = currencyRateMapper
           .toDomainDTO(rateEntities);
 
-      cacheRates(baseCurrencyName, domainDTOs);
+      cacheRate(domainDTOs);
 
       cachedDTOList.addAll(domainDTOs);
 
       return currencyRateMapper.toResponseDto(baseCurrencyName, cachedDTOList);
     }
 
-    private List<CurrencyRateEntity> getCurrencyRates(String baseCurrency, Set<String> currencyNames) {
-      return currencyRateRepository.findByCurrencyAndBaseCurrency(
-          baseCurrency, currencyNames);
+    private List<CurrencyRateEntity> getCurrencyRates(
+        String baseCurrency, RateProviderEnum rateProvider, Set<String> currencyNames) {
+      return currencyRateRepository.findByCurrencyBaseCurrencyAndProvider(
+          baseCurrency, currencyNames, rateProvider);
     }
 
-    private List<CurrencyRateEntity> getCurrencyRates(String baseCurrency, List<String> currencyNames) {
-      return currencyRateRepository.findByCurrencyAndBaseCurrency(
-          baseCurrency, currencyNames);
+    private List<CurrencyRateEntity> getCurrencyRates(
+        String baseCurrency, RateProviderEnum rateProvider, List<String> currencyNames) {
+      return currencyRateRepository.findByCurrencyBaseCurrencyAndProvider(
+          baseCurrency, currencyNames, rateProvider);
     }
 
-    private void cacheRates(List<CurrencyDomainDTO> DTOs) {
+    private void cacheRate(List<CurrencyDomainDTO> DTOs) {
       Duration ttl = Duration.ofSeconds(cacheTtlSeconds);
-      DTOs.forEach(dto -> cacheRates(ttl, dto));
+      DTOs.forEach(dto -> cacheRate(ttl, dto));
     }
 
-    private void cacheRates(Duration ttl, CurrencyDomainDTO dto) {
+    private void cacheRate(CurrencyDomainDTO dto) {
+      Duration ttl = Duration.ofSeconds(cacheTtlSeconds);
+      cacheRate(ttl, dto);
+    }
+
+    private void cacheRate(Duration ttl, CurrencyDomainDTO dto) {
         String key = RedisKeys.createCurrencyKey(dto.getBaseCurrency(), dto.getCurrency());
         redisService.cacheObject(key, ttl, dto);
     }
