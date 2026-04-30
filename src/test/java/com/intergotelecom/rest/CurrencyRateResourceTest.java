@@ -5,6 +5,7 @@ import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
 
 import com.intergotelecom.config.BaseIntegrationTest;
+import com.intergotelecom.enums.RateProviderEnum;
 import com.intergotelecom.factory.CurrencyDataFactory;
 import com.intergotelecom.rest.dto.UpdateCurrencyRateDTO;
 import com.intergotelecom.rest.dto.UpdateCurrencyRatesRequestDTO;
@@ -65,8 +66,11 @@ class CurrencyRateResourceTest extends BaseIntegrationTest {
     void setCurrencyRates_updatesExistingRates() {
         var eur = currencyDataFactory.createCurrency("EUR", true, true);
         var usd = currencyDataFactory.createCurrency("USD", false, true);
+
+        var ecb = RateProviderEnum.ECB;
+
         currencyDataFactory.createCurrency("GBP", false, true);
-        currencyDataFactory.createCurrencyRate(usd, eur, new BigDecimal("1.08"));
+        currencyDataFactory.createCurrencyRate(eur, usd, ecb, new BigDecimal("1.08"));
 
         var usdRate = UpdateCurrencyRateDTO.builder()
             .currencyName("USD")
@@ -115,9 +119,11 @@ class CurrencyRateResourceTest extends BaseIntegrationTest {
       var usd = currencyDataFactory.createCurrency("USD", false, true);
       var gbp = currencyDataFactory.createCurrency("GBP", false, true);
 
+      var ecb = RateProviderEnum.ECB;
+
       // create rates
-      currencyDataFactory.createCurrencyRate(usd, eur, new BigDecimal("1.08"));
-      currencyDataFactory.createCurrencyRate(gbp, eur, new BigDecimal("0.86"));
+      currencyDataFactory.createCurrencyRate(eur, usd, ecb, new BigDecimal("1.08"));
+      currencyDataFactory.createCurrencyRate(eur, gbp, ecb, new BigDecimal("0.86"));
 
       given()
           .accept(MediaType.APPLICATION_JSON)
@@ -145,9 +151,11 @@ class CurrencyRateResourceTest extends BaseIntegrationTest {
         var jpy = currencyDataFactory
             .createCurrency("JPY", false, true);
 
-        currencyDataFactory.createCurrencyRate(usd, eur, new BigDecimal("1.08"));
-        currencyDataFactory.createCurrencyRate(gbp, eur, new BigDecimal("0.86"));
-        currencyDataFactory.createCurrencyRate(jpy, eur, new BigDecimal("160.00"));
+        var ecb = RateProviderEnum.ECB;
+
+        currencyDataFactory.createCurrencyRate(eur, usd, ecb, new BigDecimal("1.08"));
+        currencyDataFactory.createCurrencyRate(eur, gbp, ecb, new BigDecimal("0.86"));
+        currencyDataFactory.createCurrencyRate(eur, jpy, ecb, new BigDecimal("160.00"));
 
         given()
             .queryParam("base_currency", "EUR")
