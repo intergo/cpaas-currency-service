@@ -236,6 +236,45 @@ class CurrencyRateResourceTest extends BaseIntegrationTest {
     }
 
     @Test
+    void setCustomRates_overridesEcbRateInCache() {
+        var eur = currencyDataFactory
+            .createCurrency("EUR", true, true);
+
+        var usd = currencyDataFactory
+            .createCurrency("USD", false, true);
+
+        // create ECB rate
+        currencyDataFactory.createCurrencyRate(
+            eur, usd, RateProviderEnum.ECB, BigDecimal.valueOf(1.08));
+
+        // set custom rate via endpoint
+        var customUsdRateRequest = UpdateCurrencyRateDTO.builder()
+            .currencyName("USD")
+            .rate(new BigDecimal("1.25"))
+            .build();
+
+        given()
+            .basePath("/api/v1/currency-rate")
+            .contentType(MediaType.APPLICATION_JSON)
+            .body(customUsdRateRequest)
+        .when()
+            .post("/custom")
+        .then()
+            .statusCode(Status.OK.getStatusCode());
+
+        // GET should return the custom rate
+        given()
+            .queryParam("currencies", "USD")
+        .when()
+            .get("/api/v1/currency-rate")
+        .then()
+            .statusCode(Status.OK.getStatusCode())
+            .body("currency_rates", hasSize(1))
+            .body("currency_rates[0].rate",
+                is(customUsdRateRequest.getRate().floatValue()));
+    }
+
+    @Test
     void deleteCustomRate_removesBackofficeRate() {
         var eur = currencyDataFactory
             .createCurrency("EUR", true, true);
