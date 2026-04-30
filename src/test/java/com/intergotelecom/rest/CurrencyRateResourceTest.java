@@ -207,7 +207,7 @@ class CurrencyRateResourceTest extends BaseIntegrationTest {
     }
 
     @Test
-    void setCustomRates_updatesExistingBackofficeRates() {
+    void setCustomRates_updatesExistingCustomRates() {
       var eur = currencyDataFactory.createCurrency("EUR", true, true);
       var usd = currencyDataFactory.createCurrency("USD", false, true);
 
