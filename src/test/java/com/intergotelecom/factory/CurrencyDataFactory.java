@@ -39,8 +39,9 @@ public class CurrencyDataFactory {
 
     @Transactional
     public CurrencyRateEntity createCurrencyRate(
-            CurrencyEntity currency, CurrencyEntity baseCurrency,
-            BigDecimal rate, RateProviderEnum rateProvider) {
+            CurrencyEntity baseCurrency,
+            CurrencyEntity currency,
+            RateProviderEnum rateProvider, BigDecimal rate) {
         var entity = CurrencyRateEntity.builder()
             .currency(currency)
             .baseCurrency(baseCurrency)
