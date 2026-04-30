@@ -151,6 +151,40 @@ public class CurrencyRateService {
       return currencyRateMapper.toResponseDto(baseCurrencyName, cachedDTOList);
     }
 
+    public CurrencyRatesResponseDTO setCustomRates(UpdateCurrencyRateDTO currencyRateDTO) {
+      CurrencyEntity baseCurrencyEntity = currencyService.getBaseCurrencyOptional()
+          .orElseThrow(() -> new NotFoundException("Base currency not found: " + baseCurrencyName));
+
+      Optional<CurrencyRateEntity> rateEntityOptional = getCurrencyRate(
+          baseCurrencyName, currencyRateDTO.getCurrencyName(), RateProviderEnum.CUSTOM);
+
+      CurrencyRateEntity rateEntity = rateEntityOptional.map(
+              existingEntity -> {
+                existingEntity.setRate(currencyRateDTO.getRate());
+                return existingEntity;
+              })
+          .orElseGet(() -> {
+            CurrencyEntity currencyEntity = currencyService
+                .getCurrencyByName(currencyRateDTO.getCurrencyName())
+                .orElseThrow(() ->
+                    new NotFoundException("Currency not found: " + currencyRateDTO.getCurrencyName()));
+
+            CurrencyRateEntity newRateEntity = currencyRateMapper.toEntity(
+                currencyRateDTO, RateProviderEnum.CUSTOM, currencyEntity, baseCurrencyEntity);
+
+            currencyRateRepository.persist(newRateEntity);
+
+            return newRateEntity;
+          });
+
+      CurrencyDomainDTO domainDTO = currencyRateMapper.toDomainDTO(rateEntity);
+
+      // update the cache with the custom rate
+      cacheRate(domainDTO);
+
+      return currencyRateMapper.toResponseDto(baseCurrencyName, List.of(domainDTO));
+    }
+
     private List<CurrencyRateEntity> getCurrencyRates(
         String baseCurrency, RateProviderEnum rateProvider, Set<String> currencyNames) {
       return currencyRateRepository.findByCurrencyBaseCurrencyAndProvider(
@@ -161,6 +195,12 @@ public class CurrencyRateService {
         String baseCurrency, RateProviderEnum rateProvider, List<String> currencyNames) {
       return currencyRateRepository.findByCurrencyBaseCurrencyAndProvider(
           baseCurrency, currencyNames, rateProvider);
+    }
+
+    private Optional<CurrencyRateEntity> getCurrencyRate(
+        String baseCurrency, String currencyName, RateProviderEnum rateProvider) {
+      return currencyRateRepository.findByCurrencyBaseCurrencyAndProvider(
+          baseCurrency, currencyName, rateProvider);
     }
 
     private void cacheRate(List<CurrencyDomainDTO> DTOs) {

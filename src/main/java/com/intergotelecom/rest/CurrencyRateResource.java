@@ -1,6 +1,7 @@
 package com.intergotelecom.rest;
 
 import com.intergotelecom.rest.dto.CurrencyRatesResponseDTO;
+import com.intergotelecom.rest.dto.UpdateCurrencyRateDTO;
 import com.intergotelecom.rest.dto.UpdateCurrencyRatesRequestDTO;
 import com.intergotelecom.service.CurrencyRateService;
 import jakarta.enterprise.context.RequestScoped;
@@ -43,5 +44,16 @@ public class CurrencyRateResource {
             .setCurrencyRates(currencyRates);
 
         return Response.ok(responseDTO).build();
+    }
+
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/custom")
+    public Response setCustomRates(@Valid UpdateCurrencyRateDTO requestDTO) {
+      CurrencyRatesResponseDTO responseDTO = currencyRateService
+          .setCustomRates(requestDTO);
+
+      return Response.ok(responseDTO).build();
     }
 }
