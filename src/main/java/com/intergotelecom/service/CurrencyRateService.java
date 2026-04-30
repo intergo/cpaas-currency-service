@@ -175,6 +175,30 @@ public class CurrencyRateService {
       return currencyRateMapper.toResponseDto(baseCurrencyName, List.of(domainDTO));
     }
 
+    public CurrencyRatesResponseDTO deleteCustomRate(String currencyName) {
+      // fetch custom rate entity
+      CurrencyRateEntity customRateEntity = getCurrencyRate(
+          baseCurrencyName, currencyName, RateProviderEnum.CUSTOM)
+          .orElseThrow(() -> new NotFoundException("Custom rate not found for currency: " + currencyName));
+
+      // convert to domain
+      var deletedDomainDTO = currencyRateMapper.toDomainDTO(customRateEntity);
+
+      // delete entity
+      currencyRateRepository.delete(customRateEntity);
+
+      // cache ecb rate entity
+      getCurrencyRate(baseCurrencyName, currencyName, RateProviderEnum.ECB)
+          .ifPresent(ecbRateEntity -> {
+            // convert to domain
+            var ecbDomainDTO = currencyRateMapper.toDomainDTO(ecbRateEntity);
+            cacheRate(ecbDomainDTO);
+          });
+
+      return currencyRateMapper
+          .toResponseDto(baseCurrencyName, List.of(deletedDomainDTO));
+    }
+
     private List<CurrencyRateEntity> getCurrencyRates(
         String baseCurrency, RateProviderEnum rateProvider, List<String> currencyNames) {
       return currencyRateRepository.findByCurrencyBaseCurrencyAndProvider(
