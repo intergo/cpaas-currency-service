@@ -1,5 +1,6 @@
 package com.intergotelecom.service;
 
+import com.intergotelecom.exception.CurrencyAlreadyExistsException;
 import com.intergotelecom.mapper.CurrencyMapper;
 import com.intergotelecom.model.CurrencyEntity;
 import com.intergotelecom.repository.CurrencyRepository;
@@ -38,6 +39,12 @@ public class CurrencyService {
     }
 
     public CurrencyResponseDTO createCurrency(CreateCurrencyRequestDTO dto) {
+      // assert currency does not exist
+      currencyRepository.findByCurrencyName(dto.getCurrencyName())
+          .ifPresent(existing -> {
+            throw new CurrencyAlreadyExistsException(dto.getCurrencyName());
+          });
+
       // only 1 currency should be set as base
       if (dto.isBaseCurrency()) {
         getBaseCurrencyOptional().ifPresent(
