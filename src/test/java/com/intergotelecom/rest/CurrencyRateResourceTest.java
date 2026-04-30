@@ -1,8 +1,11 @@
 package com.intergotelecom.rest;
 
+import static com.intergotelecom.enums.ErrorCodeEnum.CURRENCY_NOT_FOUND;
 import static io.restassured.RestAssured.given;
+import static org.hamcrest.Matchers.containsString;
 import static org.hamcrest.Matchers.hasSize;
 import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.notNullValue;
 
 import com.intergotelecom.config.BaseIntegrationTest;
 import com.intergotelecom.enums.RateProviderEnum;
@@ -272,6 +275,29 @@ class CurrencyRateResourceTest extends BaseIntegrationTest {
             .body("currency_rates", hasSize(1))
             .body("currency_rates[0].rate",
                 is(customUsdRateRequest.getRate().floatValue()));
+    }
+
+    @Test
+    void setCustomRate_returnsNotFound_whenCurrencyDoesNotExist() {
+      currencyDataFactory.createCurrency("EUR", true, true);
+
+      var customRateRequest = UpdateCurrencyRateDTO.builder()
+          .currencyName("XYZ")
+          .rate(new BigDecimal("1.50"))
+          .build();
+
+      given()
+          .basePath("/api/v1/currency-rate")
+          .contentType(MediaType.APPLICATION_JSON)
+          .body(customRateRequest)
+      .when()
+          .post("/custom")
+      .then()
+          .statusCode(Status.NOT_FOUND.getStatusCode())
+          .body("status", is(Status.NOT_FOUND.getStatusCode()))
+          .body("error_code", is(CURRENCY_NOT_FOUND.name()))
+          .body("message", containsString(CURRENCY_NOT_FOUND.getValue()))
+          .body("timestamp", notNullValue());
     }
 
     @Test
