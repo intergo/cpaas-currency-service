@@ -1,5 +1,8 @@
 package com.intergotelecom.service;
 
+import static com.intergotelecom.enums.ErrorCodeEnum.BASE_CURRENCY_NOT_FOUND;
+import static com.intergotelecom.enums.ErrorCodeEnum.CURRENCY_NOT_FOUND;
+
 import com.intergotelecom.enums.RateProviderEnum;
 import com.intergotelecom.enums.RedisKeys;
 import com.intergotelecom.mapper.CurrencyRateMapper;
@@ -11,7 +14,8 @@ import com.intergotelecom.rest.dto.UpdateCurrencyRateDTO;
 import com.intergotelecom.service.dto.CurrencyDomainDTO;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
-import jakarta.ws.rs.NotFoundException;
+import com.intergotelecom.exception.CurrencyNotFoundException;
+import com.intergotelecom.exception.CustomRateNotFoundException;
 import java.time.Duration;
 import java.util.List;
 import java.util.Map;
@@ -88,7 +92,8 @@ public class CurrencyRateService {
 
         // fetch base currency
         CurrencyEntity baseCurrencyEntity = currencyService.getBaseCurrencyOptional()
-            .orElseThrow(() -> new NotFoundException("Base currency not found: " + baseCurrencyName));
+            .orElseThrow(() -> new CurrencyNotFoundException(
+                BASE_CURRENCY_NOT_FOUND, baseCurrencyName));
 
         // create new rate entities
         List<CurrencyRateEntity> newRateEntities = missingCurrencies.stream()
@@ -154,10 +159,12 @@ public class CurrencyRateService {
             CurrencyEntity currencyEntity = currencyService
                 .getCurrencyByName(currencyRateDTO.getCurrencyName())
                 .orElseThrow(() ->
-                    new NotFoundException("Currency not found: " + currencyRateDTO.getCurrencyName()));
+                    new CurrencyNotFoundException(
+                        CURRENCY_NOT_FOUND, currencyRateDTO.getCurrencyName()));
 
             CurrencyEntity baseCurrencyEntity = currencyService.getBaseCurrencyOptional()
-                .orElseThrow(() -> new NotFoundException("Base currency not found: " + baseCurrencyName));
+                .orElseThrow(() -> new CurrencyNotFoundException(
+                    BASE_CURRENCY_NOT_FOUND, baseCurrencyName));
 
             CurrencyRateEntity newRateEntity = currencyRateMapper.toEntity(
                 currencyRateDTO, RateProviderEnum.CUSTOM, currencyEntity, baseCurrencyEntity);
@@ -179,7 +186,7 @@ public class CurrencyRateService {
       // fetch custom rate entity
       CurrencyRateEntity customRateEntity = getCurrencyRate(
           baseCurrencyName, currencyName, RateProviderEnum.CUSTOM)
-          .orElseThrow(() -> new NotFoundException("Custom rate not found for currency: " + currencyName));
+          .orElseThrow(() -> new CustomRateNotFoundException(currencyName));
 
       // convert to domain
       var deletedDomainDTO = currencyRateMapper.toDomainDTO(customRateEntity);
