@@ -80,12 +80,10 @@ public class CurrencyRateService {
 
         if (missingCurrencies.isEmpty()) {
             // cache currency rates to redis
-            List<CurrencyDomainDTO> domainDTOs = currencyRateMapper
-                .toDomainDTO(rateEntities);
+            var domainsDTOs = fetchAndCacheCurrencies(currenciesWithRate);
 
-            cacheRate(domainDTOs);
-
-            return currencyRateMapper.toResponseDto(baseCurrencyName, domainDTOs);
+            // create response and return
+            return currencyRateMapper.toResponseDto(baseCurrencyName, domainsDTOs);
         }
 
         // fetch base currency
@@ -107,10 +105,10 @@ public class CurrencyRateService {
         // create response and return
         rateEntities.addAll(newRateEntities);
 
-        // cache currency rates to redis
-        List<CurrencyDomainDTO> domainDTOs = currencyRateMapper.toDomainDTO(rateEntities);
+        List<String> updatedCurrenciesList = currenciesToUpdate.stream().toList();
 
-        cacheRate(domainDTOs);
+        // cache currency rates to redis
+        List<CurrencyDomainDTO> domainDTOs = fetchAndCacheCurrencies(updatedCurrenciesList);
 
         return currencyRateMapper.toResponseDto(baseCurrencyName, domainDTOs);
     }
@@ -137,17 +135,11 @@ public class CurrencyRateService {
         return currencyRateMapper.toResponseDto(baseCurrencyName, cachedDTOList);
       }
 
-      List<CurrencyRateEntity> rateEntities = getCurrencyRates(
-          baseCurrencyName, RateProviderEnum.ECB, missingCurrencies);
+      // fetch currencies and cache
+      List<CurrencyDomainDTO> domainDTOs = fetchAndCacheCurrencies(missingCurrencies);
 
-      // cache currency rates to redis
-      List<CurrencyDomainDTO> domainDTOs = currencyRateMapper
-          .toDomainDTO(rateEntities);
-
-      cacheRate(domainDTOs);
-
+      // convert to response and return
       cachedDTOList.addAll(domainDTOs);
-
       return currencyRateMapper.toResponseDto(baseCurrencyName, cachedDTOList);
     }
 
@@ -197,13 +189,50 @@ public class CurrencyRateService {
           baseCurrency, currencyNames, rateProvider);
     }
 
+    private List<CurrencyRateEntity> getCurrencyRates(
+        String baseCurrency, List<String> currencyNames) {
+      return currencyRateRepository.findByBaseCurrencyAndCurrencyNames(
+          baseCurrency, currencyNames);
+    }
+
     private Optional<CurrencyRateEntity> getCurrencyRate(
         String baseCurrency, String currencyName, RateProviderEnum rateProvider) {
       return currencyRateRepository.findByCurrencyBaseCurrencyAndProvider(
           baseCurrency, currencyName, rateProvider);
     }
 
-    private void cacheRate(List<CurrencyDomainDTO> DTOs) {
+    private List<CurrencyDomainDTO> fetchAndCacheCurrencies(List<String> currenciesToCache) {
+      // fetch rate entities
+      List<CurrencyRateEntity> rateEntities = getCurrencyRates(
+            baseCurrencyName, currenciesToCache);
+
+      // for duplicate entries we give priority to CUSTOM rates
+      Map<String, CurrencyRateEntity> rateEntityMap = rateEntities.stream()
+          .collect(Collectors.toMap(
+              rateEntity -> rateEntity.getCurrency().getCurrencyName(),
+              Function.identity(),
+              (rateEntity, duplicateRateEntity) -> {
+                if (RateProviderEnum.CUSTOM.equals(rateEntity.getRateProvider())) {
+                  return rateEntity;
+                }
+
+                return duplicateRateEntity;
+              }));
+
+      List<CurrencyRateEntity> rateEntityList = rateEntityMap.values()
+          .stream()
+          .toList();
+
+      // convert to domain
+      var domainDTOs = currencyRateMapper.toDomainDTO(rateEntityList);
+
+      // cache rates to redis
+      cacheRates(domainDTOs);
+
+      return domainDTOs;
+    }
+
+    private void cacheRates(List<CurrencyDomainDTO> DTOs) {
       Duration ttl = Duration.ofSeconds(cacheTtlSeconds);
       DTOs.forEach(dto -> cacheRate(ttl, dto));
     }
