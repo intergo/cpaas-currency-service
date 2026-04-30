@@ -10,7 +10,7 @@
                 <constraints primaryKey="true" nullable="false"/>
             </column>
             <column name="currency_name" type="varchar(10)">
-                <constraints nullable="false"/>
+                <constraints nullable="false" unique="true"/>
             </column>
             <column name="base_currency" type="boolean" defaultValueBoolean="false">
                 <constraints nullable="false"/>
