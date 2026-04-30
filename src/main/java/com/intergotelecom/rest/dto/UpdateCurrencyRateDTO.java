@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -16,6 +17,7 @@ import lombok.experimental.SuperBuilder;
 @SuperBuilder(toBuilder = true)
 public class UpdateCurrencyRateDTO {
     @NotBlank(message = "Currency name cannot be blank")
+    @Size(min = 3, max = 3, message = "Currency name must be exactly 3 characters")
     @JsonProperty("currency_name")
     private String currencyName;
 
