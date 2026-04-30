@@ -24,6 +24,13 @@ public class CurrencyRateRepository implements PanacheRepository<CurrencyRateEnt
           baseCurrency, currencyNames, rateProvider);
     }
 
+    public List<CurrencyRateEntity> findByBaseCurrencyAndCurrencyNames(
+        String baseCurrency, List<String> currencyNames) {
+      return list("baseCurrency.currencyName = ?1 "
+              + "and currency.currencyName in ?2",
+          baseCurrency, currencyNames);
+    }
+
     public Optional<CurrencyRateEntity> findByCurrencyBaseCurrencyAndProvider(
         String baseCurrency, String currencyName, RateProviderEnum rateProvider) {
       return find("baseCurrency.currencyName = ?1 "
