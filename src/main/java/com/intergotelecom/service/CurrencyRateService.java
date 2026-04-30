@@ -142,9 +142,6 @@ public class CurrencyRateService {
     }
 
     public CurrencyRatesResponseDTO setCustomRates(UpdateCurrencyRateDTO currencyRateDTO) {
-      CurrencyEntity baseCurrencyEntity = currencyService.getBaseCurrencyOptional()
-          .orElseThrow(() -> new NotFoundException("Base currency not found: " + baseCurrencyName));
-
       Optional<CurrencyRateEntity> rateEntityOptional = getCurrencyRate(
           baseCurrencyName, currencyRateDTO.getCurrencyName(), RateProviderEnum.CUSTOM);
 
@@ -158,6 +155,9 @@ public class CurrencyRateService {
                 .getCurrencyByName(currencyRateDTO.getCurrencyName())
                 .orElseThrow(() ->
                     new NotFoundException("Currency not found: " + currencyRateDTO.getCurrencyName()));
+
+            CurrencyEntity baseCurrencyEntity = currencyService.getBaseCurrencyOptional()
+                .orElseThrow(() -> new NotFoundException("Base currency not found: " + baseCurrencyName));
 
             CurrencyRateEntity newRateEntity = currencyRateMapper.toEntity(
                 currencyRateDTO, RateProviderEnum.CUSTOM, currencyEntity, baseCurrencyEntity);
