@@ -182,4 +182,56 @@ class CurrencyRateResourceTest extends BaseIntegrationTest {
           .body("base_currency_name", is("EUR"))
           .body("currency_rates", hasSize(0));
     }
+
+    @Test
+    void setCustomRates_createsNewCustomRates() {
+      currencyDataFactory.createCurrency("EUR", true, true);
+      currencyDataFactory.createCurrency("USD", false, true);
+
+      var customRateRequest = UpdateCurrencyRateDTO.builder()
+          .currencyName("USD")
+          .rate(new BigDecimal("1.20"))
+          .build();
+
+      given()
+          .basePath("/api/v1/currency-rate")
+          .contentType(MediaType.APPLICATION_JSON)
+          .body(customRateRequest)
+      .when()
+          .post("/custom")
+      .then()
+          .statusCode(Status.OK.getStatusCode())
+          .body("base_currency_name", is("EUR"))
+          .body("currency_rates", hasSize(1))
+          .body("currency_rates[0].rate", is(customRateRequest.getRate().floatValue()));
+    }
+
+    @Test
+    void setCustomRates_updatesExistingBackofficeRates() {
+      var eur = currencyDataFactory.createCurrency("EUR", true, true);
+      var usd = currencyDataFactory.createCurrency("USD", false, true);
+
+      var providerEnum = RateProviderEnum.CUSTOM;
+
+      // create existing CUSTOM rate
+      currencyDataFactory.createCurrencyRate(
+          eur, usd, providerEnum, new BigDecimal("1.20"));
+
+      var customRateRequest = UpdateCurrencyRateDTO.builder()
+          .currencyName("USD")
+          .rate(new BigDecimal("1.25"))
+          .build();
+
+      given()
+          .basePath("/api/v1/currency-rate")
+          .contentType(MediaType.APPLICATION_JSON)
+          .body(customRateRequest)
+      .when()
+          .post("/custom")
+      .then()
+          .statusCode(Status.OK.getStatusCode())
+          .body("base_currency_name", is("EUR"))
+          .body("currency_rates", hasSize(1))
+          .body("currency_rates[0].rate", is(customRateRequest.getRate().floatValue()));
+  }
 }
