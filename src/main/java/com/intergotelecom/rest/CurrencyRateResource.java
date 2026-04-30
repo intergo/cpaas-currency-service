@@ -21,6 +21,8 @@ import lombok.RequiredArgsConstructor;
 @RequestScoped
 @Path("/api/v1/currency-rate")
 @RequiredArgsConstructor
+@Consumes(MediaType.APPLICATION_JSON)
+@Produces(MediaType.APPLICATION_JSON)
 public class CurrencyRateResource {
     private final
     CurrencyRateService currencyRateService;
@@ -36,8 +38,6 @@ public class CurrencyRateResource {
     }
 
     @POST
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
     public Response setCurrencyRates(@Valid UpdateCurrencyRatesRequestDTO request) {
         List<UpdateCurrencyRateDTO> currencyRates = request.getCurrencyRates();
 
@@ -48,8 +48,6 @@ public class CurrencyRateResource {
     }
 
     @POST
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
     @Path("/custom")
     public Response setCustomRates(@Valid UpdateCurrencyRateDTO requestDTO) {
         CurrencyRatesResponseDTO responseDTO = currencyRateService
