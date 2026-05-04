@@ -1,6 +1,6 @@
 package com.intergotelecom.rest;
 
-import com.intergotelecom.rest.dto.CurrencyRatesResponseDTO;
+import com.intergotelecom.dtos.currency_rates.CurrencyRatesResponseDTO;
 import com.intergotelecom.rest.dto.UpdateCurrencyRateDTO;
 import com.intergotelecom.rest.dto.UpdateCurrencyRatesRequestDTO;
 import com.intergotelecom.service.CurrencyRateService;
