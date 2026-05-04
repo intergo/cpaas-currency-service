@@ -1,12 +1,12 @@
 package com.intergotelecom.mapper;
 
+import com.intergotelecom.dtos.currency_rates.CurrencyDomainDTO;
+import com.intergotelecom.dtos.currency_rates.CurrencyRateResponseDTO;
+import com.intergotelecom.dtos.currency_rates.CurrencyRatesResponseDTO;
 import com.intergotelecom.enums.RateProviderEnum;
 import com.intergotelecom.model.CurrencyEntity;
 import com.intergotelecom.model.CurrencyRateEntity;
-import com.intergotelecom.rest.dto.CurrencyRateResponseDTO;
-import com.intergotelecom.rest.dto.CurrencyRatesResponseDTO;
 import com.intergotelecom.rest.dto.UpdateCurrencyRateDTO;
-import com.intergotelecom.service.dto.CurrencyDomainDTO;
 import java.util.List;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
