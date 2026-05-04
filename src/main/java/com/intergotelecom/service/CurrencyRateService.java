@@ -3,15 +3,15 @@ package com.intergotelecom.service;
 import static com.intergotelecom.enums.ErrorCodeEnum.BASE_CURRENCY_NOT_FOUND;
 import static com.intergotelecom.enums.ErrorCodeEnum.CURRENCY_NOT_FOUND;
 
+import com.intergotelecom.dtos.currency_rates.CurrencyDomainDTO;
+import com.intergotelecom.dtos.currency_rates.CurrencyRatesResponseDTO;
 import com.intergotelecom.enums.RateProviderEnum;
-import com.intergotelecom.enums.RedisKeys;
+import com.intergotelecom.enums.redis.RedisKeys;
 import com.intergotelecom.mapper.CurrencyRateMapper;
 import com.intergotelecom.model.CurrencyEntity;
 import com.intergotelecom.model.CurrencyRateEntity;
 import com.intergotelecom.repository.CurrencyRateRepository;
-import com.intergotelecom.rest.dto.CurrencyRatesResponseDTO;
 import com.intergotelecom.rest.dto.UpdateCurrencyRateDTO;
-import com.intergotelecom.service.dto.CurrencyDomainDTO;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
 import com.intergotelecom.exception.CurrencyNotFoundException;
@@ -119,7 +119,7 @@ public class CurrencyRateService {
     public CurrencyRatesResponseDTO getCurrencyRatesResponse(List<String> requestedCurrencies) {
       List<CurrencyDomainDTO> cachedDTOList = requestedCurrencies.stream()
           .map(currency -> {
-            String key = RedisKeys.createCurrencyKey(baseCurrencyName, currency);
+            String key = RedisKeys.createCurrencyKey(currency);
             return redisService.getCachedObject(key);
           })
           .filter(Optional::isPresent)
@@ -266,7 +266,7 @@ public class CurrencyRateService {
     }
 
     private void cacheRate(Duration ttl, CurrencyDomainDTO dto) {
-        String key = RedisKeys.createCurrencyKey(dto.getBaseCurrency(), dto.getCurrency());
+        String key = RedisKeys.createCurrencyKey(dto.getCurrency());
         redisService.cacheObject(key, ttl, dto);
     }
 }
