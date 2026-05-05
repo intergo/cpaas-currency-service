@@ -13,6 +13,7 @@ public interface CurrencyMapper {
     CurrencyResponseDTO toResponseDto(CurrencyEntity entity);
 
     @Mapping(target = "id", ignore = true)
-    @Mapping(target = "createdAt", expression = "java(LocalDateTime.now())")
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
     CurrencyEntity toEntity(CreateCurrencyRequestDTO dto);
 }
