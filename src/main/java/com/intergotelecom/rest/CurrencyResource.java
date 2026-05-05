@@ -1,8 +1,8 @@
 package com.intergotelecom.rest;
 
+import com.intergotelecom.dtos.currency_rates.CurrencyListResponseDTO;
+import com.intergotelecom.dtos.currency_rates.CurrencyResponseDTO;
 import com.intergotelecom.rest.dto.CreateCurrencyRequestDTO;
-import com.intergotelecom.rest.dto.CurrencyListResponseDTO;
-import com.intergotelecom.rest.dto.CurrencyResponseDTO;
 import com.intergotelecom.service.CurrencyService;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.validation.Valid;

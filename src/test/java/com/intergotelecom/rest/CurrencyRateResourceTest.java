@@ -10,10 +10,10 @@ import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.notNullValue;
 
 import com.intergotelecom.config.BaseIntegrationTest;
+import com.intergotelecom.dtos.currency_rates.UpdateCurrencyRateDTO;
+import com.intergotelecom.dtos.currency_rates.UpdateCurrencyRatesRequestDTO;
 import com.intergotelecom.enums.RateProviderEnum;
 import com.intergotelecom.factory.CurrencyDataFactory;
-import com.intergotelecom.rest.dto.UpdateCurrencyRateDTO;
-import com.intergotelecom.rest.dto.UpdateCurrencyRatesRequestDTO;
 import io.quarkus.test.junit.QuarkusTest;
 import jakarta.ws.rs.core.MediaType;
 import jakarta.ws.rs.core.Response.Status;

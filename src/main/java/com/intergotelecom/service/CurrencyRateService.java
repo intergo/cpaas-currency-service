@@ -5,13 +5,13 @@ import static com.intergotelecom.enums.ErrorCodeEnum.CURRENCY_NOT_FOUND;
 
 import com.intergotelecom.dtos.currency_rates.CurrencyDomainDTO;
 import com.intergotelecom.dtos.currency_rates.CurrencyRatesResponseDTO;
+import com.intergotelecom.dtos.currency_rates.UpdateCurrencyRateDTO;
 import com.intergotelecom.enums.RateProviderEnum;
 import com.intergotelecom.enums.redis.RedisKeys;
 import com.intergotelecom.mapper.CurrencyRateMapper;
 import com.intergotelecom.model.CurrencyEntity;
 import com.intergotelecom.model.CurrencyRateEntity;
 import com.intergotelecom.repository.CurrencyRateRepository;
-import com.intergotelecom.rest.dto.UpdateCurrencyRateDTO;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
 import com.intergotelecom.exception.CurrencyNotFoundException;

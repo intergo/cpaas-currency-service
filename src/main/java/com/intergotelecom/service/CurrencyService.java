@@ -1,12 +1,12 @@
 package com.intergotelecom.service;
 
+import com.intergotelecom.dtos.currency_rates.CurrencyListResponseDTO;
+import com.intergotelecom.dtos.currency_rates.CurrencyResponseDTO;
 import com.intergotelecom.exception.CurrencyAlreadyExistsException;
 import com.intergotelecom.mapper.CurrencyMapper;
 import com.intergotelecom.model.CurrencyEntity;
 import com.intergotelecom.repository.CurrencyRepository;
 import com.intergotelecom.rest.dto.CreateCurrencyRequestDTO;
-import com.intergotelecom.rest.dto.CurrencyListResponseDTO;
-import com.intergotelecom.rest.dto.CurrencyResponseDTO;
 import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.transaction.Transactional;
 import java.util.List;

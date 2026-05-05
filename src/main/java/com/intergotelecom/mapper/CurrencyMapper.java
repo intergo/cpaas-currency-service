@@ -1,8 +1,8 @@
 package com.intergotelecom.mapper;
 
+import com.intergotelecom.dtos.currency_rates.CurrencyResponseDTO;
 import com.intergotelecom.model.CurrencyEntity;
 import com.intergotelecom.rest.dto.CreateCurrencyRequestDTO;
-import com.intergotelecom.rest.dto.CurrencyResponseDTO;
 import java.time.LocalDateTime;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
