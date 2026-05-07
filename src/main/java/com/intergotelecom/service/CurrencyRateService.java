@@ -3,6 +3,7 @@ package com.intergotelecom.service;
 import static com.intergotelecom.enums.ErrorCodeEnum.BASE_CURRENCY_NOT_FOUND;
 import static com.intergotelecom.enums.ErrorCodeEnum.CURRENCY_NOT_FOUND;
 
+import com.intergotelecom.cache.RedisService;
 import com.intergotelecom.dtos.currency_rates.CurrencyCacheDTO;
 import com.intergotelecom.dtos.currency_rates.CurrencyRatesResponseDTO;
 import com.intergotelecom.dtos.currency_rates.UpdateCurrencyRateDTO;
