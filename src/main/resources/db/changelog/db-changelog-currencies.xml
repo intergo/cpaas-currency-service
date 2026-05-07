@@ -26,4 +26,38 @@
             </column>
         </createTable>
     </changeSet>
+
+    <changeSet id="create-initial-currencies" author="alex">
+      <preConditions onFail="MARK_RAN">
+        <tableExists tableName="currencies"/>
+        <sqlCheck expectedResult="0">
+            SELECT COUNT(*) FROM currencies
+            WHERE currency_name IN ('EUR', 'USD')
+        </sqlCheck>
+      </preConditions>
+
+      <insert tableName="currencies">
+        <column name="currency_name" value="EUR"/>
+        <column name="base_currency" valueBoolean="true"/>
+        <column name="available" valueBoolean="true"/>
+        <column name="created_at" valueComputed="CURRENT_TIMESTAMP"/>
+        <column name="updated_at" valueComputed="CURRENT_TIMESTAMP"/>
+      </insert>
+
+      <insert tableName="currencies">
+        <column name="currency_name" value="USD"/>
+        <column name="base_currency" valueBoolean="false"/>
+        <column name="available" valueBoolean="true"/>
+        <column name="created_at" valueComputed="CURRENT_TIMESTAMP"/>
+        <column name="updated_at" valueComputed="CURRENT_TIMESTAMP"/>
+      </insert>
+
+      <insert tableName="currencies">
+        <column name="currency_name" value="CAD"/>
+        <column name="base_currency" valueBoolean="false"/>
+        <column name="available" valueBoolean="true"/>
+        <column name="created_at" valueComputed="CURRENT_TIMESTAMP"/>
+        <column name="updated_at" valueComputed="CURRENT_TIMESTAMP"/>
+      </insert>
+  </changeSet>
 </databaseChangeLog>
