@@ -3,7 +3,7 @@ package com.intergotelecom.service;
 import static com.intergotelecom.enums.ErrorCodeEnum.BASE_CURRENCY_NOT_FOUND;
 import static com.intergotelecom.enums.ErrorCodeEnum.CURRENCY_NOT_FOUND;
 
-import com.intergotelecom.dtos.currency_rates.CurrencyDomainDTO;
+import com.intergotelecom.dtos.currency_rates.CurrencyCacheDTO;
 import com.intergotelecom.dtos.currency_rates.CurrencyRatesResponseDTO;
 import com.intergotelecom.dtos.currency_rates.UpdateCurrencyRateDTO;
 import com.intergotelecom.enums.RateProviderEnum;
@@ -39,7 +39,7 @@ public class CurrencyRateService {
     CurrencyService currencyService;
 
     private final
-    RedisService<CurrencyDomainDTO> redisService;
+    RedisService<CurrencyCacheDTO> redisService;
 
     @ConfigProperty(name = "currency.rate.cache.ttl", defaultValue = "3600")
     private long cacheTtlSeconds;
@@ -111,13 +111,13 @@ public class CurrencyRateService {
         rateEntities.addAll(newRateEntities);
 
         // cache currency rates to redis
-        List<CurrencyDomainDTO> domainDTOs = fetchAndCacheCurrencies(currenciesToUpdate);
+        List<CurrencyCacheDTO> domainDTOs = fetchAndCacheCurrencies(currenciesToUpdate);
 
         return currencyRateMapper.toResponseDto(baseCurrencyName, domainDTOs);
     }
 
     public CurrencyRatesResponseDTO getCurrencyRatesResponse(List<String> requestedCurrencies) {
-      List<CurrencyDomainDTO> cachedDTOList = requestedCurrencies.stream()
+      List<CurrencyCacheDTO> cachedDTOList = requestedCurrencies.stream()
           .map(currency -> {
             String key = RedisKeys.createCurrencyKey(currency);
             return redisService.getCachedObject(key);
@@ -127,7 +127,7 @@ public class CurrencyRateService {
           .collect(Collectors.toList());
 
       List<String> foundCurrencies = cachedDTOList.stream()
-          .map(CurrencyDomainDTO::getCurrency)
+          .map(CurrencyCacheDTO::getCurrency)
           .toList();
 
       List<String> missingCurrencies = requestedCurrencies.stream()
@@ -139,7 +139,7 @@ public class CurrencyRateService {
       }
 
       // fetch currencies and cache
-      List<CurrencyDomainDTO> domainDTOs = fetchAndCacheCurrencies(missingCurrencies);
+      List<CurrencyCacheDTO> domainDTOs = fetchAndCacheCurrencies(missingCurrencies);
 
       // convert to response and return
       cachedDTOList.addAll(domainDTOs);
@@ -174,7 +174,7 @@ public class CurrencyRateService {
             return newRateEntity;
           });
 
-      CurrencyDomainDTO domainDTO = currencyRateMapper.toDomainDTO(rateEntity);
+      CurrencyCacheDTO domainDTO = currencyRateMapper.toDomainDTO(rateEntity);
 
       // update the cache with the custom rate
       cacheRate(domainDTO);
@@ -224,7 +224,7 @@ public class CurrencyRateService {
           baseCurrency, currencyName, rateProvider);
     }
 
-    private List<CurrencyDomainDTO> fetchAndCacheCurrencies(List<String> currenciesToCache) {
+    private List<CurrencyCacheDTO> fetchAndCacheCurrencies(List<String> currenciesToCache) {
       // fetch rate entities
       List<CurrencyRateEntity> rateEntities = getCurrencyRates(
             baseCurrencyName, currenciesToCache);
@@ -255,17 +255,17 @@ public class CurrencyRateService {
       return domainDTOs;
     }
 
-    private void cacheRates(List<CurrencyDomainDTO> DTOs) {
+    private void cacheRates(List<CurrencyCacheDTO> DTOs) {
       Duration ttl = Duration.ofSeconds(cacheTtlSeconds);
       DTOs.forEach(dto -> cacheRate(ttl, dto));
     }
 
-    private void cacheRate(CurrencyDomainDTO dto) {
+    private void cacheRate(CurrencyCacheDTO dto) {
       Duration ttl = Duration.ofSeconds(cacheTtlSeconds);
       cacheRate(ttl, dto);
     }
 
-    private void cacheRate(Duration ttl, CurrencyDomainDTO dto) {
+    private void cacheRate(Duration ttl, CurrencyCacheDTO dto) {
         String key = RedisKeys.createCurrencyKey(dto.getCurrency());
         redisService.cacheObject(key, ttl, dto);
     }

@@ -1,6 +1,6 @@
 package com.intergotelecom.mapper;
 
-import com.intergotelecom.dtos.currency_rates.CurrencyDomainDTO;
+import com.intergotelecom.dtos.currency_rates.CurrencyCacheDTO;
 import com.intergotelecom.dtos.currency_rates.CurrencyRateResponseDTO;
 import com.intergotelecom.dtos.currency_rates.CurrencyRatesResponseDTO;
 import com.intergotelecom.dtos.currency_rates.UpdateCurrencyRateDTO;
@@ -16,20 +16,20 @@ import org.mapstruct.MappingConstants.ComponentModel;
 public interface CurrencyRateMapper {
     @Mapping(target = "currencyName", source = "currency")
     @Mapping(target = "rate", source = "rate")
-    CurrencyRateResponseDTO toResponseDto(CurrencyDomainDTO domainDTO);
+    CurrencyRateResponseDTO toResponseDto(CurrencyCacheDTO domainDTO);
 
-    List<CurrencyRateResponseDTO> toResponseDto(List<CurrencyDomainDTO> dtos);
+    List<CurrencyRateResponseDTO> toResponseDto(List<CurrencyCacheDTO> dtos);
 
     @Mapping(target = "baseCurrencyName", source = "baseCurrency")
     @Mapping(target = "currencyRates", source = "dtos")
-    CurrencyRatesResponseDTO toResponseDto(String baseCurrency, List<CurrencyDomainDTO> dtos);
+    CurrencyRatesResponseDTO toResponseDto(String baseCurrency, List<CurrencyCacheDTO> dtos);
 
     @Mapping(target = "baseCurrency", source = "baseCurrency.currencyName")
     @Mapping(target = "rate", source = "rate")
     @Mapping(target = "currency", source = "currency.currencyName")
-    CurrencyDomainDTO toDomainDTO(CurrencyRateEntity entity);
+    CurrencyCacheDTO toDomainDTO(CurrencyRateEntity entity);
 
-    List<CurrencyDomainDTO> toDomainDTO(List<CurrencyRateEntity> entities);
+    List<CurrencyCacheDTO> toDomainDTO(List<CurrencyRateEntity> entities);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "createdAt", ignore = true)
