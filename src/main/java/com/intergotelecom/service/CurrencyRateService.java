@@ -18,6 +18,7 @@ import jakarta.transaction.Transactional;
 import com.intergotelecom.exception.CurrencyNotFoundException;
 import com.intergotelecom.exception.CustomRateNotFoundException;
 import java.time.Duration;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -40,10 +41,16 @@ public class CurrencyRateService {
     CurrencyService currencyService;
 
     private final
-    RedisService<CurrencyCacheDTO> redisService;
+    RedisService<CurrencyCacheDTO> currencyCacheService;
+
+    private final
+    RedisService<String> redisStrService;
 
     @ConfigProperty(name = "currency.rate.cache.ttl", defaultValue = "3600")
-    private long cacheTtlSeconds;
+    private long currencyCacheTtlSeconds;
+
+    @ConfigProperty(name = "rate-update-timestamp.cache.ttl", defaultValue = "345600")
+    private long updateTimestampCacheTtlSeconds;
 
     @ConfigProperty(name = "app.base-currency", defaultValue = "EUR")
     private String baseCurrencyName;
@@ -87,6 +94,9 @@ public class CurrencyRateService {
             // cache currency rates to redis
             var domainsDTOs = fetchAndCacheCurrencies(currenciesWithRate);
 
+            // update latest update timestamp
+            cacheLatestUpdateTimestamp();
+
             // create response and return
             return currencyRateMapper.toResponseDto(baseCurrencyName, domainsDTOs);
         }
@@ -114,6 +124,9 @@ public class CurrencyRateService {
         // cache currency rates to redis
         List<CurrencyCacheDTO> domainDTOs = fetchAndCacheCurrencies(currenciesToUpdate);
 
+        // update latest update timestamp
+        cacheLatestUpdateTimestamp();
+
         return currencyRateMapper.toResponseDto(baseCurrencyName, domainDTOs);
     }
 
@@ -121,7 +134,7 @@ public class CurrencyRateService {
       List<CurrencyCacheDTO> cachedDTOList = requestedCurrencies.stream()
           .map(currency -> {
             String key = RedisKeys.createCurrencyKey(currency);
-            return redisService.getCachedObject(key);
+            return currencyCacheService.getCachedObject(key);
           })
           .filter(Optional::isPresent)
           .map(Optional::get)
@@ -257,17 +270,26 @@ public class CurrencyRateService {
     }
 
     private void cacheRates(List<CurrencyCacheDTO> DTOs) {
-      Duration ttl = Duration.ofSeconds(cacheTtlSeconds);
+      Duration ttl = Duration.ofSeconds(currencyCacheTtlSeconds);
       DTOs.forEach(dto -> cacheRate(ttl, dto));
     }
 
     private void cacheRate(CurrencyCacheDTO dto) {
-      Duration ttl = Duration.ofSeconds(cacheTtlSeconds);
+      Duration ttl = Duration.ofSeconds(currencyCacheTtlSeconds);
       cacheRate(ttl, dto);
     }
 
     private void cacheRate(Duration ttl, CurrencyCacheDTO dto) {
         String key = RedisKeys.createCurrencyKey(dto.getCurrency());
-        redisService.cacheObject(key, ttl, dto);
+        currencyCacheService.cacheObject(key, ttl, dto);
+    }
+
+    private void cacheLatestUpdateTimestamp() {
+        var key = RedisKeys.LATEST_RATE_UPDATE_TIMESTAMP;
+        var timestamp = Instant.now().getEpochSecond();
+        var duration = Duration.ofSeconds(updateTimestampCacheTtlSeconds);
+
+        redisStrService.cacheObject(
+                key.getValue(), duration, String.valueOf(timestamp));
     }
 }
